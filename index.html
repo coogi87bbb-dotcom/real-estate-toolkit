@@ -1,1159 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>The Deal Closer AI — Full Arsenal</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<style>
-  :root {
-    --gold: #C9A84C;
-    --gold-light: #E2C47A;
-    --gold-dim: #8a6f2e;
-    --black: #0A0A0A;
-    --dark: #111111;
-    --card: #161616;
-    --card2: #1C1C1C;
-    --border: #2a2a2a;
-    --text: #E8E2D6;
-    --muted: #888;
-    --accent: #C9A84C;
-    --red: #e05252;
-    --green: #52c48a;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--black);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    background-image:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,168,76,0.08) 0%, transparent 70%),
-      repeating-linear-gradient(0deg, transparent, transparent 80px, rgba(201,168,76,0.015) 80px, rgba(201,168,76,0.015) 81px),
-      repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(201,168,76,0.015) 80px, rgba(201,168,76,0.015) 81px);
-  }
-
-  /* ── HEADER ── */
-  header {
-    text-align: center;
-    padding: 56px 20px 32px;
-    position: relative;
-  }
-  .crown { font-size: 2rem; display: block; margin-bottom: 8px; animation: pulse 3s ease-in-out infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
-  header h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 5vw, 3.6rem);
-    font-weight: 900;
-    letter-spacing: -0.02em;
-    background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, var(--gold-dim) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1.1;
-  }
-  header .subtitle {
-    margin-top: 10px;
-    font-size: 0.78rem;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--gold-dim);
-    font-weight: 500;
-  }
-  .divider {
-    width: 120px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    margin: 20px auto;
-  }
-
-  /* ── NAV TABS ── */
-  .nav-wrap {
-    width: 100%;
-    overflow-x: auto;
-    padding: 0 16px 4px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .nav-wrap::-webkit-scrollbar { display:none; }
-  nav {
-    display: flex;
-    gap: 6px;
-    width: max-content;
-    margin: 0 auto;
-    padding: 4px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-  }
-  nav button {
-    padding: 10px 18px;
-    border-radius: 10px;
-    border: none;
-    background: transparent;
-    color: var(--muted);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.78rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-    letter-spacing: 0.02em;
-  }
-  nav button:hover { color: var(--gold-light); background: rgba(201,168,76,0.06); }
-  nav button.active {
-    background: linear-gradient(135deg, rgba(201,168,76,0.2), rgba(201,168,76,0.08));
-    color: var(--gold-light);
-    border: 1px solid rgba(201,168,76,0.3);
-  }
-
-  /* ── MAIN LAYOUT ── */
-  main {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 28px 16px 80px;
-  }
-
-  /* ── PANELS ── */
-  .panel { display: none; animation: fadeIn 0.35s ease; }
-  .panel.active { display: block; }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-
-  /* ── CARD ── */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 28px;
-    margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
-  }
-  .card::before {
-    content:'';
-    position:absolute;
-    top:0;left:0;right:0;
-    height:2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    opacity:0.5;
-  }
-  .card-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: var(--gold-light);
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .card-desc {
-    font-size: 0.82rem;
-    color: var(--muted);
-    margin-bottom: 22px;
-    line-height: 1.6;
-    letter-spacing: 0.01em;
-  }
-
-  /* ── FORM ELEMENTS ── */
-  label {
-    display: block;
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--gold-dim);
-    margin-bottom: 6px;
-    margin-top: 16px;
-  }
-  input, select, textarea {
-    width: 100%;
-    background: var(--card2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 14px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    transition: border-color 0.2s;
-    outline: none;
-  }
-  input:focus, select:focus, textarea:focus { border-color: var(--gold-dim); }
-  select option { background: var(--dark); }
-  textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
-
-  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-  @media(max-width:600px){ .row2,.row3{ grid-template-columns:1fr; } }
-
-  /* ── BUTTONS ── */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 13px 26px;
-    border-radius: 10px;
-    border: none;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.04em;
-  }
-  .btn-gold {
-    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
-    color: #000;
-    width: 100%;
-    justify-content: center;
-    margin-top: 20px;
-    font-size: 0.9rem;
-  }
-  .btn-gold:hover { filter: brightness(1.12); transform: translateY(-1px); }
-  .btn-gold:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
-  .btn-sm {
-    padding: 8px 16px;
-    font-size: 0.75rem;
-    background: rgba(201,168,76,0.1);
-    color: var(--gold-light);
-    border: 1px solid rgba(201,168,76,0.2);
-    border-radius: 8px;
-  }
-  .btn-sm:hover { background: rgba(201,168,76,0.2); }
-
-  /* ── OUTPUT BOX ── */
-  .output-box {
-    margin-top: 22px;
-    background: var(--card2);
-    border: 1px solid rgba(201,168,76,0.2);
-    border-radius: 14px;
-    overflow: hidden;
-  }
-  .output-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(201,168,76,0.04);
-  }
-  .output-header span {
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--gold-dim);
-    font-weight: 600;
-  }
-  .output-content {
-    padding: 20px;
-    font-size: 0.88rem;
-    line-height: 1.8;
-    color: var(--text);
-    white-space: pre-wrap;
-    font-family: 'DM Mono', monospace;
-    min-height: 80px;
-  }
-  .output-content:empty::before { content: 'Output will appear here...'; color: var(--muted); font-style: italic; }
-
-  /* ── SECTION RESULT ── */
-  .section-result {
-    margin-top: 16px;
-    border-radius: 12px;
-    background: var(--card2);
-    border: 1px solid var(--border);
-    overflow: hidden;
-  }
-  .section-result-header {
-    padding: 10px 16px;
-    background: rgba(201,168,76,0.06);
-    border-bottom: 1px solid var(--border);
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--gold-dim);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .section-result-body {
-    padding: 16px;
-    font-size: 0.87rem;
-    line-height: 1.8;
-    white-space: pre-wrap;
-    color: var(--text);
-  }
-
-  /* ── CALCULATOR ── */
-  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
-  .stat-box {
-    background: var(--card2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    text-align: center;
-  }
-  .stat-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-  .stat-value { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--gold-light); }
-  .stat-value.green { color: var(--green); }
-  .stat-value.big { font-size: 2rem; }
-
-  /* ── LOADING ── */
-  .loading { display: none; text-align: center; padding: 24px; }
-  .loading.show { display: block; }
-  .spinner {
-    width: 32px; height: 32px;
-    border: 2px solid var(--border);
-    border-top-color: var(--gold);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 12px;
-  }
-  @keyframes spin { to{transform:rotate(360deg)} }
-  .loading p { font-size: 0.8rem; color: var(--muted); }
-
-  /* ── DEADLINE TRACKER ── */
-  .deadline-list { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
-  .deadline-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 12px 16px;
-    background: var(--card2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    transition: border-color 0.2s;
-  }
-  .deadline-item:hover { border-color: rgba(201,168,76,0.3); }
-  .deadline-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .dot-green { background: var(--green); }
-  .dot-gold { background: var(--gold); }
-  .dot-red { background: var(--red); }
-  .deadline-label { flex: 1; font-size: 0.85rem; }
-  .deadline-date { font-size: 0.78rem; color: var(--gold-dim); font-family:'DM Mono',monospace; }
-  .deadline-days { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-
-  /* ── EMAIL TABS ── */
-  .email-tabs { display:flex; gap:6px; margin-top:16px; flex-wrap:wrap; }
-  .email-tab {
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .email-tab.active { background: rgba(201,168,76,0.1); color: var(--gold-light); border-color: rgba(201,168,76,0.3); }
-
-  /* ── COPY TOAST ── */
-  #toast {
-    position: fixed;
-    bottom: 28px;
-    right: 28px;
-    background: var(--gold);
-    color: #000;
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    opacity: 0;
-    transition: opacity 0.3s;
-    z-index: 999;
-  }
-  #toast.show { opacity: 1; }
-
-  /* ── RANGE SLIDER ── */
-  input[type=range] {
-    -webkit-appearance: none;
-    height: 4px;
-    background: var(--border);
-    border-radius: 4px;
-    border: none;
-    padding: 0;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: var(--gold);
-    cursor: pointer;
-  }
-
-  /* ── MISC ── */
-  .badge {
-    display: inline-block;
-    padding: 2px 10px;
-    border-radius: 99px;
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  .badge-gold { background: rgba(201,168,76,0.15); color: var(--gold-light); border: 1px solid rgba(201,168,76,0.25); }
-  .badge-new { background: rgba(82,196,138,0.15); color: var(--green); border: 1px solid rgba(82,196,138,0.25); }
-  .info-row { display:flex; gap:6px; align-items:center; margin-top:8px; }
-
-  hr.thin { border:none; border-top:1px solid var(--border); margin:20px 0; }
-
-  footer {
-    text-align:center;
-    padding:24px;
-    font-size:0.72rem;
-    color:var(--muted);
-    letter-spacing:0.08em;
-  }
-  footer span { color: var(--gold-dim); }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Deal Closer AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gold-text { color: #D4AF37; }
+        .gold-bg { background-color: #D4AF37; }
+        .gold-border { border-color: #D4AF37; }
+    </style>
 </head>
-<body>
-
-<header>
-  <span class="crown">⚜️</span>
-  <h1>THE DEAL CLOSER AI</h1>
-  <p class="subtitle">Full Arsenal Edition — 7 Power Tools for Elite Agents</p>
-  <div class="divider"></div>
-</header>
-
-<div class="nav-wrap">
-  <nav>
-    <button class="active" onclick="show('commission',this)">💰 Commission</button>
-    <button onclick="show('marketing',this)">📣 Marketing</button>
-    <button onclick="show('offer',this)">🤝 Offer & Counter</button>
-    <button onclick="show('followup',this)">📧 Follow-Up</button>
-    <button onclick="show('listing',this)">🏠 Listing Copy</button>
-    <button onclick="show('openhouse',this)">🗝️ Open House</button>
-    <button onclick="show('timeline',this)">📅 Deadlines</button>
-  </nav>
-</div>
-
-<main>
-
-<!-- ═══════════════════════════════════════════
-     PANEL 1 — COMMISSION CALCULATOR
-═══════════════════════════════════════════ -->
-<div id="panel-commission" class="panel active">
-  <div class="card">
-    <div class="card-title">👑 Commission Split & Net Sheet Calculator</div>
-    <div class="card-desc">Calculate your exact take-home on any deal in seconds. No more math mistakes on closing day.</div>
-
-    <label>Property Sale Price ($)</label>
-    <input type="number" id="salePrice" placeholder="e.g. 485000" oninput="calcCommission()"/>
-
-    <label>Total Commission Rate (%)</label>
-    <input type="number" id="commRate" placeholder="e.g. 6" step="0.1" oninput="calcCommission()"/>
-
-    <label>Listing / Buyer Split</label>
-    <div class="row2">
-      <div>
-        <input type="number" id="listSplit" placeholder="Listing % (e.g. 50)" step="1" oninput="calcCommission()"/>
-      </div>
-      <div>
-        <input type="number" id="buySplit" placeholder="Buyer % (e.g. 50)" step="1" oninput="calcCommission()"/>
-      </div>
-    </div>
-
-    <label>Your Broker Split (you keep %)</label>
-    <input type="number" id="agentSplit" placeholder="e.g. 80" step="1" oninput="calcCommission()"/>
-
-    <label>Transaction Fees & Costs ($)</label>
-    <input type="number" id="fees" placeholder="e.g. 350" oninput="calcCommission()"/>
-
-    <div class="stat-grid">
-      <div class="stat-box">
-        <div class="stat-label">Gross Commission</div>
-        <div class="stat-value big" id="grossComm">$0</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Your Side Gross</div>
-        <div class="stat-value" id="yourSideGross">$0</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">After Broker Split</div>
-        <div class="stat-value" id="afterBroker">$0</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-label">Your Net Take-Home</div>
-        <div class="stat-value green" id="netTakeHome">$0</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════
-     PANEL 2 — AI MARKETING ENGINE
-═══════════════════════════════════════════ -->
-<div id="panel-marketing" class="panel">
-  <div class="card">
-    <div class="card-title">📣 AI Marketing & Strategy Engine</div>
-    <div class="card-desc">Full specialist strategy: SEO positioning, market pitch, buyer ROI angle, and social media scripts — all in one shot.</div>
-
-    <label>Property Specs & Key Assets</label>
-    <textarea id="mktSpecs" placeholder="e.g. 4BR/3BA, 2,200 sqft, renovated kitchen, pool, corner lot, new roof 2023, 3-car garage..."></textarea>
-
-    <label>Target Market / Neighborhood</label>
-    <input type="text" id="mktNeighborhood" placeholder="e.g. Buckhead Atlanta, first-time buyers, luxury investors..."/>
-
-    <label>Listing Price</label>
-    <input type="text" id="mktPrice" placeholder="e.g. $525,000"/>
-
-    <button class="btn btn-gold" onclick="runMarketing()" id="mktBtn">⚡ Generate Full Strategy Package</button>
-
-    <div class="loading" id="mktLoading"><div class="spinner"></div><p>Crafting your specialist strategy...</p></div>
-
-    <div id="mktOutput" style="display:none">
-      <div id="mkt1" class="section-result"></div>
-      <div id="mkt2" class="section-result" style="margin-top:12px"></div>
-      <div id="mkt3" class="section-result" style="margin-top:12px"></div>
-      <div id="mkt4" class="section-result" style="margin-top:12px"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════
-     PANEL 3 — OFFER & COUNTER-OFFER GENERATOR
-═══════════════════════════════════════════ -->
-<div id="panel-offer" class="panel">
-  <div class="card">
-    <div class="card-title">🤝 Offer & Counter-Offer Generator <span class="badge badge-new">NEW</span></div>
-    <div class="card-desc">Generate a complete negotiation strategy + professional offer language in 30 seconds. Saves 2–4 hours per transaction and gives green agents the edge of a 40-year veteran.</div>
-
-    <label>Are You Representing</label>
-    <select id="offerSide">
-      <option value="buyer">The Buyer</option>
-      <option value="seller">The Seller</option>
-    </select>
-
-    <div class="row2">
-      <div>
-        <label>Asking / List Price ($)</label>
-        <input type="number" id="offerAsk" placeholder="e.g. 499000"/>
-      </div>
-      <div>
-        <label>Offer / Counter Price ($)</label>
-        <input type="number" id="offerPrice" placeholder="e.g. 472000"/>
-      </div>
-    </div>
-
-    <label>Property Address / Description</label>
-    <input type="text" id="offerAddr" placeholder="e.g. 142 Maple St — 3BR/2BA ranch, 90 days on market"/>
-
-    <label>Days on Market</label>
-    <input type="number" id="offerDOM" placeholder="e.g. 47"/>
-
-    <label>Contingencies to Include</label>
-    <div class="row3">
-      <label style="text-transform:none;letter-spacing:0;font-size:0.85rem;color:var(--text);margin:0;display:flex;align-items:center;gap:8px;cursor:pointer">
-        <input type="checkbox" id="contInspect" style="width:auto;border:none;padding:0" checked/> Inspection
-      </label>
-      <label style="text-transform:none;letter-spacing:0;font-size:0.85rem;color:var(--text);margin:0;display:flex;align-items:center;gap:8px;cursor:pointer">
-        <input type="checkbox" id="contFinance" style="width:auto;border:none;padding:0" checked/> Financing
-      </label>
-      <label style="text-transform:none;letter-spacing:0;font-size:0.85rem;color:var(--text);margin:0;display:flex;align-items:center;gap:8px;cursor:pointer">
-        <input type="checkbox" id="contAppraisal" style="width:auto;border:none;padding:0" checked/> Appraisal
-      </label>
-    </div>
-
-    <label>Seller Motivation Level</label>
-    <select id="offerMotivation">
-      <option value="unknown">Unknown</option>
-      <option value="low">Low — Testing the market</option>
-      <option value="medium">Medium — Ready to move in 60–90 days</option>
-      <option value="high">High — Needs to close fast, motivated</option>
-      <option value="distressed">Distressed — Pre-foreclosure / divorce / estate</option>
-    </select>
-
-    <label>Closing Timeline Requested</label>
-    <input type="text" id="offerClose" placeholder="e.g. 30 days, 45 days, flexible"/>
-
-    <label>Special Terms or Concessions</label>
-    <textarea id="offerTerms" style="min-height:70px" placeholder="e.g. seller pays closing costs, include appliances, leaseback 30 days, as-is on inspection..."></textarea>
-
-    <button class="btn btn-gold" onclick="runOffer()" id="offerBtn">⚔️ Generate Negotiation Strategy + Offer Language</button>
-    <div class="loading" id="offerLoading"><div class="spinner"></div><p>Building your negotiation playbook...</p></div>
-    <div id="offerOutput"></div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════
-     PANEL 4 — FOLLOW-UP EMAIL SEQUENCE
-═══════════════════════════════════════════ -->
-<div id="panel-followup" class="panel">
-  <div class="card">
-    <div class="card-title">📧 Client Follow-Up Email Sequence <span class="badge badge-new">NEW</span></div>
-    <div class="card-desc">Stop losing deals to silence. Generate a personalized 5-email drip sequence for any lead type — ready to copy-paste into your CRM in 60 seconds.</div>
-
-    <label>Lead Type</label>
-    <select id="fuLeadType">
-      <option value="first_time_buyer">First-Time Buyer</option>
-      <option value="move_up_buyer">Move-Up Buyer (selling + buying)</option>
-      <option value="investor">Real Estate Investor</option>
-      <option value="relocating">Corporate Relocation</option>
-      <option value="downsizer">Empty Nester / Downsizer</option>
-      <option value="seller_lead">Potential Seller Lead</option>
-      <option value="open_house">Open House Attendee</option>
-      <option value="cold">Cold Lead (no engagement in 30+ days)</option>
-    </select>
-
-    <label>Lead's Name</label>
-    <input type="text" id="fuName" placeholder="e.g. Marcus & Tanya"/>
-
-    <label>Their Situation / What You Know</label>
-    <textarea id="fuSituation" placeholder="e.g. Pre-approved for $420K, looking in Midtown, saw 3 homes last week, price is the main concern, lease ends in 4 months..."></textarea>
-
-    <label>Your Name & Brokerage</label>
-    <input type="text" id="fuAgent" placeholder="e.g. Keisha Williams, KW Metro"/>
-
-    <label>Sequence Tone</label>
-    <select id="fuTone">
-      <option value="warm_professional">Warm & Professional</option>
-      <option value="direct_urgency">Direct with Urgency</option>
-      <option value="consultative">Consultative / Advisor</option>
-      <option value="casual_friendly">Casual & Friendly</option>
-    </select>
-
-    <button class="btn btn-gold" onclick="runFollowUp()" id="fuBtn">✉️ Generate 5-Email Drip Sequence</button>
-    <div class="loading" id="fuLoading"><div class="spinner"></div><p>Writing your follow-up sequence...</p></div>
-
-    <div id="fuOutput" style="display:none">
-      <div class="email-tabs" id="emailTabs"></div>
-      <div id="emailContent" class="output-box" style="margin-top:10px">
-        <div class="output-content" id="emailBody"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════
-     PANEL 5 — LISTING DESCRIPTION GENERATOR
-═══════════════════════════════════════════ -->
-<div id="panel-listing" class="panel">
-  <div class="card">
-    <div class="card-title">🏠 Listing Description Generator <span class="badge badge-new">NEW</span></div>
-    <div class="card-desc">MLS-optimized listing copy with SEO scoring. Turn 1-minute of input into a description that stops scrollers and attracts the right buyer.</div>
-
-    <div class="row2">
-      <div>
-        <label>Beds / Baths</label>
-        <input type="text" id="ldBedBath" placeholder="e.g. 4BD / 3.5BA"/>
-      </div>
-      <div>
-        <label>Square Footage</label>
-        <input type="number" id="ldSqft" placeholder="e.g. 2450"/>
-      </div>
-    </div>
-
-    <label>Property Type</label>
-    <select id="ldType">
-      <option value="single_family">Single Family Home</option>
-      <option value="condo">Condo / Townhome</option>
-      <option value="luxury">Luxury Estate</option>
-      <option value="investment">Investment / Multi-family</option>
-      <option value="land">Land / Lot</option>
-      <option value="commercial">Commercial</option>
-    </select>
-
-    <label>Top Features & Upgrades (list everything)</label>
-    <textarea id="ldFeatures" placeholder="e.g. Renovated chef's kitchen, quartz counters, SS appliances, primary suite with spa bath, 3-car garage, resort-style pool, smart home, corner lot, cul-de-sac, new HVAC 2023, hardwood floors throughout..."></textarea>
-
-    <label>Neighborhood & Location Selling Points</label>
-    <input type="text" id="ldLocation" placeholder="e.g. Top-rated schools, walk to downtown, 5 min from I-285, gated community..."/>
-
-    <label>Ideal Buyer Target</label>
-    <select id="ldBuyer">
-      <option value="families">Growing Families</option>
-      <option value="professionals">Young Professionals</option>
-      <option value="luxury">Luxury Buyers</option>
-      <option value="investors">Investors / ROI Focus</option>
-      <option value="retirees">Retirees / Downsizers</option>
-      <option value="first_time">First-Time Buyers</option>
-    </select>
-
-    <label>Listing Price</label>
-    <input type="text" id="ldPrice" placeholder="e.g. $649,000"/>
-
-    <button class="btn btn-gold" onclick="runListing()" id="ldBtn">✍️ Generate MLS Listing + SEO Score</button>
-    <div class="loading" id="ldLoading"><div class="spinner"></div><p>Crafting your listing masterpiece...</p></div>
-    <div id="ldOutput"></div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════
-     PANEL 6 — OPEN HOUSE SCRIPT BUILDER
-═══════════════════════════════════════════ -->
-<div id="panel-openhouse" class="panel">
-  <div class="card">
-    <div class="card-title">🗝️ Open House ROI & Script Builder <span class="badge badge-new">NEW</span></div>
-    <div class="card-desc">Stop winging your open house. Get a custom script, lead qualification questions, and post-event follow-up emails — for every type of visitor that walks through the door.</div>
-
-    <label>Property Address & Type</label>
-    <input type="text" id="ohAddr" placeholder="e.g. 318 Oak Blvd — 4BR colonial, $549K, Roswell GA"/>
-
-    <label>Key Property Highlights (top 5)</label>
-    <textarea id="ohHighlights" style="min-height:70px" placeholder="e.g. Just renovated, new roof, best school district in county, huge backyard, priced $30K below comps..."></textarea>
-
-    <label>Your Open House Budget ($)</label>
-    <input type="number" id="ohBudget" placeholder="e.g. 500"/>
-
-    <label>Expected Visitor Mix</label>
-    <select id="ohVisitor">
-      <option value="mixed">Mixed — Families, Investors & Curious Neighbors</option>
-      <option value="luxury">Luxury Buyers Only</option>
-      <option value="first_time">Mostly First-Time Buyers</option>
-      <option value="investors">Investment-Focused</option>
-    </select>
-
-    <label>Open House Date & Time</label>
-    <input type="text" id="ohDate" placeholder="e.g. Saturday May 31, 1:00 PM – 4:00 PM"/>
-
-    <button class="btn btn-gold" onclick="runOpenHouse()" id="ohBtn">🏡 Generate Open House Playbook</button>
-    <div class="loading" id="ohLoading"><div class="spinner"></div><p>Building your open house playbook...</p></div>
-    <div id="ohOutput"></div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════
-     PANEL 7 — TRANSACTION TIMELINE TRACKER
-═══════════════════════════════════════════ -->
-<div id="panel-timeline" class="panel">
-  <div class="card">
-    <div class="card-title">📅 Transaction Deadline Tracker <span class="badge badge-new">NEW</span></div>
-    <div class="card-desc">One missed deadline can kill your deal and cost you your license. Enter your contract date and closing date — get every critical milestone with buffer alerts.</div>
-
-    <div class="row2">
-      <div>
-        <label>Contract Acceptance Date</label>
-        <input type="date" id="tlContract"/>
-      </div>
-      <div>
-        <label>Target Closing Date</label>
-        <input type="date" id="tlClose"/>
-      </div>
-    </div>
-
-    <label>Transaction Type</label>
-    <select id="tlType">
-      <option value="conventional">Conventional Loan</option>
-      <option value="fha">FHA Loan</option>
-      <option value="va">VA Loan</option>
-      <option value="cash">Cash Purchase</option>
-      <option value="jumbo">Jumbo / Non-Conforming</option>
-    </select>
-
-    <label>State (affects timelines)</label>
-    <input type="text" id="tlState" placeholder="e.g. Georgia, Texas, Florida..."/>
-
-    <label>Special Conditions</label>
-    <div class="row2">
-      <label style="text-transform:none;letter-spacing:0;font-size:0.85rem;color:var(--text);margin:0;display:flex;align-items:center;gap:8px;cursor:pointer">
-        <input type="checkbox" id="tlHOA" style="width:auto;border:none;padding:0"/> HOA Approval Required
-      </label>
-      <label style="text-transform:none;letter-spacing:0;font-size:0.85rem;color:var(--text);margin:0;display:flex;align-items:center;gap:8px;cursor:pointer">
-        <input type="checkbox" id="tlSeptic" style="width:auto;border:none;padding:0"/> Septic Inspection
-      </label>
-    </div>
-
-    <button class="btn btn-gold" onclick="runTimeline()">📋 Generate Full Deadline Timeline</button>
-
-    <div id="tlOutput" style="display:none;margin-top:20px">
-      <div class="deadline-list" id="deadlineList"></div>
-      <div style="margin-top:16px;padding:14px;background:rgba(224,82,82,0.08);border:1px solid rgba(224,82,82,0.2);border-radius:10px;font-size:0.8rem;color:#e05252;line-height:1.7">
-        ⚠️ <strong>Critical:</strong> Always verify deadlines with your broker and title company. State laws and contract addenda can override standard timelines. Dates shown include 1-day buffer.
-      </div>
-    </div>
-
-    <div id="tlAIOutput"></div>
-  </div>
-</div>
-
-</main>
-
-<footer>THE DEAL CLOSER AI &nbsp;|&nbsp; <span>Full Arsenal Edition</span> &nbsp;|&nbsp; Powered by Claude AI</footer>
-
-<div id="toast">✅ Copied to clipboard!</div>
-
-<script>
-// ═══════ NAV ═══════
-function show(id, btn) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById('panel-' + id).classList.add('active');
-  btn.classList.add('active');
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-
-// ═══════ TOAST ═══════
-function toast() {
-  const t = document.getElementById('toast');
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2200);
-}
-function copyText(txt) {
-  navigator.clipboard.writeText(txt).then(toast).catch(()=>{
-    const ta=document.createElement('textarea');
-    ta.value=txt; document.body.appendChild(ta);
-    ta.select(); document.execCommand('copy');
-    document.body.removeChild(ta); toast();
-  });
-}
-
-// ═══════ COMMISSION CALC ═══════
-function calcCommission() {
-  const price = parseFloat(document.getElementById('salePrice').value)||0;
-  const rate  = parseFloat(document.getElementById('commRate').value)||0;
-  const list  = parseFloat(document.getElementById('listSplit').value)||50;
-  const buy   = parseFloat(document.getElementById('buySplit').value)||50;
-  const agent = parseFloat(document.getElementById('agentSplit').value)||80;
-  const fees  = parseFloat(document.getElementById('fees').value)||0;
-  const gross = price * rate / 100;
-  const yourGross = gross * list / 100;
-  const afterBroker = yourGross * agent / 100;
-  const net = afterBroker - fees;
-  const fmt = v => '$'+v.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
-  document.getElementById('grossComm').textContent = fmt(gross);
-  document.getElementById('yourSideGross').textContent = fmt(yourGross);
-  document.getElementById('afterBroker').textContent = fmt(afterBroker);
-  document.getElementById('netTakeHome').textContent = fmt(net);
-}
-
-// ═══════ ANTHROPIC CALL ═══════
-async function callClaude(systemPrompt, userPrompt) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1800,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }]
-    })
-  });
-  const data = await res.json();
-  return data.content?.map(b => b.text||'').join('') || 'Error generating response.';
-}
-
-function setLoading(id, on) {
-  document.getElementById(id).style.display = on ? 'block' : 'none';
-}
-function setBtn(id, on) {
-  document.getElementById(id).disabled = !on;
-}
-
-function makeSection(title, content, id) {
-  return `<div class="section-result">
-    <div class="section-result-header">
-      <span>${title}</span>
-      <button class="btn btn-sm" onclick="copyText(document.getElementById('src-${id}').innerText)">Copy</button>
-    </div>
-    <div class="section-result-body" id="src-${id}">${content}</div>
-  </div>`;
-}
-
-// ═══════ MARKETING ═══════
-async function runMarketing() {
-  const specs = document.getElementById('mktSpecs').value.trim();
-  const nbhd  = document.getElementById('mktNeighborhood').value.trim();
-  const price = document.getElementById('mktPrice').value.trim();
-  if (!specs) { alert('Please enter property specs.'); return; }
-
-  setBtn('mktBtn',false); setLoading('mktLoading',true);
-  document.getElementById('mktOutput').style.display='none';
-
-  const system = `You are a real estate marketing specialist with 40 years of experience. You have sold over $2 billion in real estate and have mastered SEO, social media, luxury positioning, and buyer psychology. Always respond in plain text without markdown asterisks or pound signs.`;
-
-  const prompt = `Property: ${specs}\nNeighborhood/Target: ${nbhd}\nPrice: ${price}\n\nGenerate 4 separate sections:\n\n[SEO STRATEGY]: Write 5 high-converting SEO keywords + a 90-word SEO meta description optimized for Zillow, Realtor.com, and Google.\n\n[MARKET POSITIONING PITCH]: Write a 100-word market positioning pitch for listing presentations. Why this home beats its competition right now.\n\n[BUYER PROFIT & ROI ANGLE]: Write a 100-word buyer-facing ROI pitch. Include equity potential, rent comp value, and appreciation angle.\n\n[TIKTOK/REEL SCRIPT]: Write a complete 30-second TikTok/Instagram Reel script with hook, middle, and call to action. Include emojis. Make it viral-worthy.`;
-
-  try {
-    const raw = await callClaude(system, prompt);
-    const s1 = extract(raw,'SEO STRATEGY');
-    const s2 = extract(raw,'MARKET POSITIONING PITCH');
-    const s3 = extract(raw,'BUYER PROFIT & ROI ANGLE');
-    const s4 = extract(raw,'TIKTOK/REEL SCRIPT');
-    document.getElementById('mkt1').innerHTML = makeSection('📊 SEO Strategy', s1, 'mkt1');
-    document.getElementById('mkt2').innerHTML = makeSection('🏆 Market Positioning Pitch', s2, 'mkt2');
-    document.getElementById('mkt3').innerHTML = makeSection('💰 Buyer ROI & Profit Angle', s3, 'mkt3');
-    document.getElementById('mkt4').innerHTML = makeSection('📹 TikTok / Reel Script', s4, 'mkt4');
-    document.getElementById('mktOutput').style.display='block';
-  } catch(e) { alert('Error: ' + e.message); }
-
-  setLoading('mktLoading',false); setBtn('mktBtn',true);
-}
-
-function extract(text, label) {
-  const re = new RegExp(`\\[${label}\\]:?\\s*([\\s\\S]*?)(?=\\[|$)`,'i');
-  const m = text.match(re);
-  return m ? m[1].trim() : text.trim();
-}
-
-// ═══════ OFFER & COUNTER ═══════
-async function runOffer() {
-  const side  = document.getElementById('offerSide').value;
-  const ask   = document.getElementById('offerAsk').value;
-  const offer = document.getElementById('offerPrice').value;
-  const addr  = document.getElementById('offerAddr').value;
-  const dom   = document.getElementById('offerDOM').value;
-  const motiv = document.getElementById('offerMotivation').value;
-  const close = document.getElementById('offerClose').value;
-  const terms = document.getElementById('offerTerms').value;
-  const inspect  = document.getElementById('contInspect').checked ? 'Inspection' : '';
-  const finance  = document.getElementById('contFinance').checked ? 'Financing' : '';
-  const appraisal= document.getElementById('contAppraisal').checked ? 'Appraisal' : '';
-  const conts = [inspect,finance,appraisal].filter(Boolean).join(', ') || 'None';
-
-  if (!ask || !offer) { alert('Please enter asking price and offer price.'); return; }
-
-  setBtn('offerBtn',false); setLoading('offerLoading',true);
-  document.getElementById('offerOutput').innerHTML='';
-
-  const pct = ask ? ((ask-offer)/ask*100).toFixed(1) : '';
-
-  const system = `You are a master real estate negotiator with 40 years of experience. You have closed over 3,000 transactions and trained hundreds of agents on negotiation. You know every psychological and tactical lever in real estate deals. Write in plain text, no asterisks or pound signs.`;
-
-  const prompt = `I am representing the ${side}.\nProperty: ${addr || 'the subject property'}\nList Price: $${Number(ask).toLocaleString()}\nOffer/Counter Price: $${Number(offer).toLocaleString()} (${pct}% ${side==='buyer'?'below':'above or at'} ask)\nDays on Market: ${dom||'unknown'}\nContingencies: ${conts}\nSeller Motivation: ${motiv}\nRequested Closing: ${close||'standard'}\nSpecial Terms: ${terms||'None'}\n\nGenerate a professional response with these 4 sections:\n\n[NEGOTIATION STRATEGY]: A 150-word expert negotiation playbook for me as the agent. What leverage do I have? What are the risks? What is my opening move and my fallback position? Be brutally specific.\n\n[OFFER LANGUAGE]: Write the actual professional offer language I can drop into a contract or email — formal, specific, and airtight. Include all contingencies and terms.\n\n[OBJECTION RESPONSES]: Write 3 likely objections the other side will make + my exact scripted response to each. Sharp, confident, professional.\n\n[WALK-AWAY POINT]: Tell me exactly where my client's walk-away point should be and why, given all the facts above.`;
-
-  try {
-    const raw = await callClaude(system, prompt);
-    const s1 = extract(raw,'NEGOTIATION STRATEGY');
-    const s2 = extract(raw,'OFFER LANGUAGE');
-    const s3 = extract(raw,'OBJECTION RESPONSES');
-    const s4 = extract(raw,'WALK-AWAY POINT');
-    document.getElementById('offerOutput').innerHTML =
-      makeSection('⚔️ Negotiation Strategy', s1, 'off1') +
-      makeSection('📄 Offer Language', s2, 'off2') +
-      makeSection('🛡️ Objection Responses', s3, 'off3') +
-      makeSection('🚪 Walk-Away Analysis', s4, 'off4');
-  } catch(e) { alert('Error: ' + e.message); }
-
-  setLoading('offerLoading',false); setBtn('offerBtn',true);
-}
-
-// ═══════ FOLLOW-UP EMAIL SEQUENCE ═══════
-let emailSequence = [];
-let activeEmail = 0;
-
-async function runFollowUp() {
-  const leadType = document.getElementById('fuLeadType').value;
-  const name     = document.getElementById('fuName').value.trim()||'the client';
-  const situation= document.getElementById('fuSituation').value.trim();
-  const agent    = document.getElementById('fuAgent').value.trim()||'Your Agent';
-  const tone     = document.getElementById('fuTone').value;
-
-  setBtn('fuBtn',false); setLoading('fuLoading',true);
-  document.getElementById('fuOutput').style.display='none';
-
-  const system = `You are a top real estate agent with 40 years of experience and a mastery of client psychology and conversion. You write emails that feel personal, not templated. Every email you write converts at 3x the industry average. Write in plain text, no asterisks or markdown.`;
-
-  const prompt = `Client name: ${name}\nLead type: ${leadType.replace(/_/g,' ')}\nSituation: ${situation||'Interested buyer/seller, no specific details provided'}\nAgent: ${agent}\nTone: ${tone.replace(/_/g,' ')}\n\nWrite a 5-email follow-up sequence. Each email must be different — vary the approach, angle, and length. Label them exactly as:\n[EMAIL 1 - Subject Line Here]\n[EMAIL 2 - Subject Line Here]\netc.\n\nEmail 1: Immediate reconnect — personal, references their specific situation\nEmail 2: Value-add — share something genuinely useful (market insight, tip, data)\nEmail 3: Social proof — a story or result from a similar client you helped\nEmail 4: Soft urgency — market conditions or opportunity they might miss\nEmail 5: Final check-in — clean, no pressure, keeps the door open\n\nEach email should be 100–180 words. Do not use generic filler. Make it feel like a real person wrote it.`;
-
-  try {
-    const raw = await callClaude(system, prompt);
-    // Parse emails
-    emailSequence = [];
-    const re = /\[EMAIL (\d) - ([^\]]+)\]([\s\S]*?)(?=\[EMAIL \d|$)/gi;
-    let m;
-    while ((m = re.exec(raw)) !== null) {
-      emailSequence.push({ num: m[1], subject: m[2].trim(), body: m[3].trim() });
-    }
-    if (!emailSequence.length) {
-      emailSequence = [{ num:'1', subject:'Follow-Up Sequence', body: raw }];
-    }
-    renderEmailTabs(0);
-    document.getElementById('fuOutput').style.display='block';
-  } catch(e) { alert('Error: ' + e.message); }
-
-  setLoading('fuLoading',false); setBtn('fuBtn',true);
-}
-
-function renderEmailTabs(active) {
-  activeEmail = active;
-  const tabsEl = document.getElementById('emailTabs');
-  tabsEl.innerHTML = emailSequence.map((e,i)=>
-    `<button class="email-tab${i===active?' active':''}" onclick="renderEmailTabs(${i})">Email ${e.num}</button>`
-  ).join('');
-  const e = emailSequence[active];
-  document.getElementById('emailBody').innerHTML =
-    `<strong style="color:var(--gold-light);font-family:'DM Sans';font-size:0.8rem;letter-spacing:0.08em;text-transform:uppercase">Subject: ${e.subject}</strong>\n\n${e.body}`;
-  document.querySelector('.output-header .btn-sm') && null;
-  // add copy button
-  const ob = document.getElementById('emailContent');
-  ob.querySelector('.output-header') && ob.querySelector('.output-header').remove();
-  const hdr = document.createElement('div');
-  hdr.className='output-header';
-  hdr.innerHTML=`<span>Email ${e.num} of ${emailSequence.length}</span><button class="btn btn-sm" onclick="copyText(emailSequence[${active}].body)">Copy Email</button>`;
-  ob.prepend(hdr);
-}
-
-// ═══════ LISTING DESCRIPTION ═══════
-async function runListing() {
-  const bd    = document.getElementById('ldBedBath').value;
-  const sqft  = document.getElementById('ldSqft').value;
-  const type  = document.getElementById('ldType').value;
-  const feats = document.getElementById('ldFeatures').value.trim();
-  const loc   = document.getElementById('ldLocation').value.trim();
-  const buyer = document.getElementById('ldBuyer').value;
-  const price = document.getElementById('ldPrice').value;
-
-  if (!feats) { alert('Please enter property features.'); return; }
-
-  setBtn('ldBtn',false); setLoading('ldLoading',true);
-  document.getElementById('ldOutput').innerHTML='';
-
-  const system = `You are a master real estate copywriter with 40 years of experience. Your listing descriptions consistently sell homes faster and above asking price. You understand buyer psychology, SEO for property platforms, and how to create emotional urgency. Write in plain text without markdown.`;
-
-  const prompt = `Property: ${bd||''} | ${sqft||''}sqft | ${type.replace(/_/g,' ')}\nFeatures: ${feats}\nLocation highlights: ${loc||'desirable neighborhood'}\nTarget buyer: ${buyer}\nPrice: ${price||'priced competitively'}\n\nGenerate:\n\n[MLS DESCRIPTION]: A 200-250 word MLS listing description. Lead with the single most compelling hook sentence. Create emotional desire. End with a call to action.\n\n[SHORT DESCRIPTION]: A 75-word version for social media, flyers, and email blasts.\n\n[HEADLINE OPTIONS]: 5 compelling headline options for marketing materials.\n\n[SEO SCORE]: Rate this listing's SEO strength 1-10 and list the top 5 keywords naturally embedded in the description. Explain what would make it score higher.`;
-
-  try {
-    const raw = await callClaude(system, prompt);
-    const s1 = extract(raw,'MLS DESCRIPTION');
-    const s2 = extract(raw,'SHORT DESCRIPTION');
-    const s3 = extract(raw,'HEADLINE OPTIONS');
-    const s4 = extract(raw,'SEO SCORE');
-    document.getElementById('ldOutput').innerHTML =
-      makeSection('📝 Full MLS Description (200–250 words)', s1, 'ld1') +
-      makeSection('📱 Short Version (Social / Flyers)', s2, 'ld2') +
-      makeSection('💡 Headline Options', s3, 'ld3') +
-      makeSection('📊 SEO Strength Score & Keywords', s4, 'ld4');
-  } catch(e) { alert('Error: ' + e.message); }
-
-  setLoading('ldLoading',false); setBtn('ldBtn',true);
-}
-
-// ═══════ OPEN HOUSE ═══════
-async function runOpenHouse() {
-  const addr   = document.getElementById('ohAddr').value.trim();
-  const hi     = document.getElementById('ohHighlights').value.trim();
-  const budget = document.getElementById('ohBudget').value;
-  const vis    = document.getElementById('ohVisitor').value;
-  const date   = document.getElementById('ohDate').value.trim();
-
-  if (!addr) { alert('Please enter the property address.'); return; }
-
-  setBtn('ohBtn',false); setLoading('ohLoading',true);
-  document.getElementById('ohOutput').innerHTML='';
-
-  const system = `You are an elite real estate agent with 40 years of experience and a specialty in open house strategy. You have hosted over 4,000 open houses and convert at 3x the national average. You know exactly how to read visitors, qualify leads on the spot, and turn tire-kickers into buyers. Write in plain text without markdown.`;
-
-  const prompt = `Property: ${addr}\nKey Highlights: ${hi||'great home in desirable area'}\nBudget: $${budget||'300'}\nExpected visitors: ${vis.replace(/_/g,' ')}\nDate/Time: ${date||'this weekend'}\n\nGenerate a complete open house playbook with these sections:\n\n[BUDGET BREAKDOWN]: How to allocate the $${budget||'300'} budget for maximum ROI (staging items, food, signage, digital ads, etc.)\n\n[AGENT SCRIPT]: A complete word-for-word open house script: greeting, 3 property tour talking points that create desire, how to handle objections, and the perfect closing line to get their contact info.\n\n[LEAD QUALIFICATION QUESTIONS]: 6 questions to ask every visitor that reveal if they are a real buyer, their timeline, their budget, and their motivation — without feeling like an interrogation.\n\n[FOLLOW-UP PLAN]: Specific follow-up email templates for 3 visitor types: (1) Serious buyer, (2) Maybe/Not sure, (3) Nosy neighbor/tire-kicker who might know a buyer.`;
-
-  try {
-    const raw = await callClaude(system, prompt);
-    const s1 = extract(raw,'BUDGET BREAKDOWN');
-    const s2 = extract(raw,'AGENT SCRIPT');
-    const s3 = extract(raw,'LEAD QUALIFICATION QUESTIONS');
-    const s4 = extract(raw,'FOLLOW-UP PLAN');
-    document.getElementById('ohOutput').innerHTML =
-      makeSection('💵 Budget Breakdown & ROI Allocation', s1, 'oh1') +
-      makeSection('🎤 Complete Agent Script', s2, 'oh2') +
-      makeSection('🔍 Lead Qualification Questions', s3, 'oh3') +
-      makeSection('📬 Post-Event Follow-Up Templates', s4, 'oh4');
-  } catch(e) { alert('Error: ' + e.message); }
-
-  setLoading('ohLoading',false); setBtn('ohBtn',true);
-}
-
-// ═══════ TRANSACTION TIMELINE ═══════
-function runTimeline() {
-  const contractDate = document.getElementById('tlContract').value;
-  const closeDate    = document.getElementById('tlClose').value;
-  const type         = document.getElementById('tlType').value;
-  const state        = document.getElementById('tlState').value;
-  const hoa          = document.getElementById('tlHOA').checked;
-  const septic       = document.getElementById('tlSeptic').checked;
-
-  if (!contractDate || !closeDate) { alert('Please enter contract and closing dates.'); return; }
-
-  const contract = new Date(contractDate + 'T12:00:00');
-  const closing  = new Date(closeDate + 'T12:00:00');
-  const totalDays = Math.round((closing - contract) / 86400000);
-
-  function addDays(d, n) {
-    const r = new Date(d); r.setDate(r.getDate()+n); return r;
-  }
-  function fmt(d) {
-    return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-  }
-  function status(d) {
-    const today = new Date();
-    const diff = Math.round((d - today) / 86400000);
-    if (diff < 0) return {cls:'dot-red', label:`${Math.abs(diff)} days ago`};
-    if (diff <= 3) return {cls:'dot-red', label:`⚠️ ${diff} days`};
-    if (diff <= 7) return {cls:'dot-gold', label:`${diff} days`};
-    return {cls:'dot-green', label:`${diff} days`};
-  }
-
-  // Build milestones based on type
-  let milestones = [];
-  const inspDays = type === 'cash' ? 7 : 10;
-  const loanDays = type === 'cash' ? 0 : (type === 'va' ? 21 : (type === 'fha' ? 18 : 14));
-  const apprDays = type === 'cash' ? 0 : (type === 'va' ? 25 : 21);
-  const commitDays = type === 'cash' ? 0 : Math.round(totalDays * 0.7);
-  const walkDays = totalDays - 1;
-  const titleDays = Math.round(totalDays * 0.4);
-
-  milestones.push({label:'📋 Contract Acceptance', date: contract, note:'Day 0 — Start all clocks'});
-  milestones.push({label:'🔍 Inspection Deadline', date: addDays(contract, inspDays), note:`${inspDays} days — Schedule immediately`});
-  if (hoa) milestones.push({label:'🏘️ HOA Docs Request Due', date: addDays(contract, inspDays), note:'Request docs same day as inspection'});
-  if (septic) milestones.push({label:'💧 Septic Inspection', date: addDays(contract, inspDays+2), note:'Book ASAP — can take 2 weeks'});
-  if (type !== 'cash') {
-    milestones.push({label:'📑 Loan Application Submitted', date: addDays(contract, 3), note:'Buyer must apply within 3 days'});
-    milestones.push({label:'📬 Appraisal Ordered', date: addDays(contract, apprDays - 7), note:'Order early — appraisers are backed up'});
-    milestones.push({label:'🏡 Appraisal Deadline', date: addDays(contract, apprDays), note:`${apprDays} days — low appraisal kills deals`});
-    milestones.push({label:'💳 Loan Commitment', date: addDays(contract, commitDays), note:`${commitDays} days — lender must commit by this date`});
-  }
-  milestones.push({label:'📁 Title Search Clear', date: addDays(contract, titleDays), note:`${titleDays} days — flag any liens immediately`});
-  milestones.push({label:'🔐 Final Walkthrough', date: addDays(contract, walkDays), note:'24–48 hrs before closing'});
-  milestones.push({label:'💰 Wire Funds / Cashier Check', date: addDays(contract, totalDays - 1), note:'Day before closing — confirm wire instructions'});
-  milestones.push({label:'🎉 CLOSING DAY', date: closing, note:'🏆 Target date — stay on schedule!'});
-
-  // Sort by date
-  milestones.sort((a,b)=>a.date-b.date);
-
-  const html = milestones.map(m => {
-    const s = status(m.date);
-    return `<div class="deadline-item">
-      <div class="deadline-dot ${s.cls}"></div>
-      <div style="flex:1">
-        <div class="deadline-label">${m.label}</div>
-        <div class="deadline-days">${m.note}</div>
-      </div>
-      <div style="text-align:right">
-        <div class="deadline-date">${fmt(m.date)}</div>
-        <div class="deadline-days">${s.label}</div>
-      </div>
-    </div>`;
-  }).join('');
-
-  document.getElementById('deadlineList').innerHTML = html;
-  document.getElementById('tlOutput').style.display='block';
-
-  // Also get AI tips for this specific situation
-  getTimelineTips(type, state, totalDays, hoa, septic);
-}
-
-async function getTimelineTips(type, state, days, hoa, septic) {
-  document.getElementById('tlAIOutput').innerHTML = `<div class="loading show"><div class="spinner"></div><p>Generating expert tips for your specific transaction...</p></div>`;
-  const system = `You are a real estate transaction coordinator and broker with 40 years of experience. You have managed thousands of closings across all 50 states. Write in plain text without markdown.`;
-  const prompt = `Transaction: ${type.replace(/_/g,' ')} loan, ${state||'unknown state'}, ${days} days to closing${hoa?' with HOA approval needed':''}${septic?' with septic inspection needed':''}.\n\nGive me:\n[EXPERT TIPS]: 5 specific expert warnings and tips for THIS type of transaction that most agents miss. Be brutally specific about what kills deals and what saves them.\n\n[AGENT CHECKLIST]: A 10-item week-by-week action checklist for me as the agent from contract to close.`;
-  try {
-    const raw = await callClaude(system, prompt);
-    const s1 = extract(raw,'EXPERT TIPS');
-    const s2 = extract(raw,'AGENT CHECKLIST');
-    document.getElementById('tlAIOutput').innerHTML =
-      makeSection('🧠 Expert Tips for Your Transaction Type', s1, 'tl1') +
-      makeSection('✅ Agent Week-by-Week Checklist', s2, 'tl2');
-  } catch(e) {
-    document.getElementById('tlAIOutput').innerHTML = '';
-  }
-}
-</script>
+<body class="bg-black text-white font-sans antialiased">
+
+    <header class="border-b border-zinc-800 bg-zinc-950 p-5 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-black tracking-widest text-white">
+                THE DEAL <span class="gold-text">CLOSER</span> AI
+            </h1>
+            <span class="text-xs border gold-border gold-text px-3 py-1 rounded-full font-mono uppercase tracking-wider">
+                SEO • Market • Profit Specialist
+            </span>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 space-y-8 mt-4">
+
+        <section class="bg-zinc-950 border border-zinc-800 rounded-xl p-6 shadow-2xl">
+            <div class="flex items-center space-x-3 mb-6">
+                <span class="text-2xl gold-text">⚜️</span>
+                <h2 class="text-lg font-bold tracking-wide uppercase">Commission Split &amp; Net Sheet Calculator</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Property Sale Price ($)</label>
+                        <input type="number" id="salePrice" placeholder="e.g. 750000" class="w-full bg-black border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:gold-border font-mono text-lg">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Total Commission Rate (%)</label>
+                        <input type="number" id="commRate" value="6" class="w-full bg-black border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:gold-border font-mono text-lg">
+                    </div>
+                </div>
+                
+                <div class="bg-zinc-900/50 border border-zinc-800 rounded-lg p-5 flex flex-col justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Gross Commission Revenue</div>
+                        <div id="totalCommDisplay" class="text-4xl font-black gold-text mt-2">$0</div>
+                    </div>
+                    <div class="border-t border-zinc-800 pt-4 mt-4 grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="block text-xs text-zinc-500 uppercase tracking-tight">Listing Broker Share:</span>
+                            <span id="listingAgentShare" class="font-bold text-white text-lg">$0</span>
+                        </div>
+                        <div>
+                            <span class="block text-xs text-zinc-500 uppercase tracking-tight">Buyer Broker Share:</span>
+                            <span id="buyingAgentShare" class="font-bold text-white text-lg">$0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-zinc-950 border border-zinc-800 rounded-xl p-6 shadow-2xl">
+            <div class="flex items-center space-x-3 mb-6">
+                <span class="text-2xl gold-text">👑</span>
+                <div class="flex flex-col">
+                    <h2 class="text-lg font-bold tracking-wide uppercase">AI Marketing &amp; Strategy Engine</h2>
+                    <span class="text-xs gold-text font-mono tracking-tight">Mode: SEO, Market &amp; Profit Specialist</span>
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Property Specs &amp; Key Assets</label>
+                        <input type="text" id="propertySpecs" placeholder="e.g. 4 bed, 3.5 bath, quartz counters" class="w-full bg-black border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:gold-border">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Target Market / Neighborhood</label>
+                        <input type="text" id="propertyLocation" placeholder="e.g. North End Suburbs, High-Demand Zone" class="w-full bg-black border border-zinc-800 rounded-lg p-3 text-white focus:outline-none focus:gold-border">
+                    </div>
+                </div>
+                
+                <button id="generateBtn" class="w-full gold-bg hover:opacity-90 text-black font-black p-4 rounded-lg transition duration-200 uppercase tracking-widest text-sm shadow-lg cursor-pointer">
+                    Generate Specialist Strategy Package
+                </button>
+                
+                <div class="bg-black border border-zinc-800 rounded-lg p-5 space-y-6 hidden mt-4" id="outputArea">
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-mono gold-text tracking-widest uppercase font-bold">[📈 1. High-Rank SEO Listing Copy]</span>
+                            <span class="text-[10px] text-zinc-500 font-mono">Keywords Optimized</span>
+                        </div>
+                        <p id="seoOutput" class="text-sm text-zinc-300 bg-zinc-900/40 p-4 rounded border border-zinc-800 leading-relaxed"></p>
+                    </div>
+                    <div>
+                        <span class="text-xs font-mono gold-text tracking-widest uppercase font-bold block mb-2">[📊 2. Market Positioning Pitch]</span>
+                        <p id="marketOutput" class="text-sm text-zinc-300 bg-zinc-900/40 p-4 rounded border border-zinc-800 leading-relaxed"></p>
+                    </div>
+                    <div>
+                        <span class="text-xs font-mono gold-text tracking-widest uppercase font-bold block mb-2">[💰 3. Buyer Profit &amp; ROI Angle]</span>
+                        <p id="profitOutput" class="text-sm text-zinc-300 bg-zinc-900/40 p-4 rounded border border-zinc-800 leading-relaxed"></p>
+                    </div>
+                    <div>
+                        <span class="text-xs font-mono text-white tracking-widest uppercase font-bold block mb-2 border-t border-zinc-800 pt-4">[📹 4. TikTok / Instagram Reel Script]</span>
+                        <p id="scriptOutput" class="text-sm text-zinc-300 bg-zinc-900/40 p-4 rounded border gold-border leading-relaxed font-mono whitespace-pre-line"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Safely map elements after DOM completely loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const salePriceInput = document.getElementById('salePrice');
+            const commRateInput = document.getElementById('commRate');
+            const totalCommDisplay = document.getElementById('totalCommDisplay');
+            const listingAgentShare = document.getElementById('listingAgentShare');
+            const buyingAgentShare = document.getElementById('buyingAgentShare');
+            const generateBtn = document.getElementById('generateBtn');
+            const outputArea = document.getElementById('outputArea');
+            
+            const seoOutput = document.getElementById('seoOutput');
+            const marketOutput = document.getElementById('marketOutput');
+            const profitOutput = document.getElementById('profitOutput');
+            const scriptOutput = document.getElementById('scriptOutput');
+
+            function calculateCommission() {
+                if (!salePriceInput || !commRateInput || !totalCommDisplay || !listingAgentShare || !buyingAgentShare) return;
+                
+                const price = parseFloat(salePriceInput.value) || 0;
+                const rate = parseFloat(commRateInput.value) || 0;
+                
+                const totalComm = price * (rate / 100);
+                const splitComm = totalComm / 2;
+
+                totalCommDisplay.innerText = '$' + totalComm.toLocaleString(undefined, {maximumFractionDigits: 0});
+                listingAgentShare.innerText = '$' + splitComm.toLocaleString(undefined, {maximumFractionDigits: 0});
+                buyingAgentShare.innerText = '$' + splitComm.toLocaleString(undefined, {maximumFractionDigits: 0});
+            }
+
+            if (salePriceInput) salePriceInput.addEventListener('input', calculateCommission);
+            if (commRateInput) commRateInput.addEventListener('input', calculateCommission);
+
+            // Core Strategy Engine with full element validation
+            if (generateBtn) {
+                generateBtn.addEventListener('click', () => {
+                    const specsInput = document.getElementById('propertySpecs');
+                    const locInput = document.getElementById('propertyLocation');
+                    
+                    const specs = (specsInput && specsInput.value) ? specsInput.value : "Premium Property";
+                    const loc = (locInput && locInput.value) ? locInput.value : "Prime Real Estate Market";
+                    
+                    if (outputArea) {
+                        outputArea.classList.remove('hidden');
+                    }
+                    
+                    // Populate outputs safely
+                    if (seoOutput) {
+                        seoOutput.innerText = `Looking for homes for sale in ${loc}? This stunning ${specs} offers the perfect blend of modern architecture and high-end convenience. Perfect for buyers searching for premium listings in ${loc}, featuring maximum architectural appeal and top-tier upgrades. [Keywords: ${loc} real estate, homes for sale near ${loc}, ${specs} features]`;
+                    }
+                    
+                    if (marketOutput) {
+                        marketOutput.innerText = `🏠 MARKET ANALYSIS: In the current competitive landscape of ${loc}, properties with these exact structural specifications (${specs}) are trading at a premium. Inventory constraints mean high immediate buyer demand. This listing positions an agent to capture maximum market attention and drive multiple competing offers before the first open house.`;
+                    }
+                    
+                    if (profitOutput) {
+                        profitOutput.innerText = `💎 ROI & PROFIT ANGLE: This isn't just a home, it's a high-yield asset class. Given the historical equity velocity in ${loc}, acquiring an asset with ${specs} provides immediate defensive equity protection. Ideal for long-term wealth preservation or strategic leverage. Your money works harder here.`;
+                    }
+                    
+                    if (scriptOutput) {
+                        scriptOutput.innerText = `[Visual: Start outside the front door, looking into the property]\n\n"Stop scrolling if you are trying to time the market in ${loc}. Right now, assets with these specific specs—${specs}—are driving the highest historical equity velocity in this sub-market.\n\n[Visual: Fast cut to the main premium feature or kitchen]\n\nThis isn't just an open house tour. This is a look at a high-yield defensive asset protection play. If you want the full market analysis packet and target ROI projections on this exact spot before it hits the mainstream MLS, drop a comment or DM me directly."`;
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
