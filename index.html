@@ -552,18 +552,27 @@ function makeSection(title, content) {
 }
 
 /* ═══════════════════════════════
-   CLAUDE API
+   AI API  (OpenAI-compatible, CORS-enabled)
 ═══════════════════════════════ */
+var _AI_BASE = 'https://api.manus.im/api/llm-proxy/v1';
+var _AI_KEY  = 'sk-Kdc58KKRTPCFeJyiAdqqJN';
+var _AI_MODEL = 'gemini-2.5-flash';
+
 async function callClaude(systemPrompt, userPrompt, maxTokens) {
   var tokens = maxTokens || 1800;
-  var res = await fetch('https://api.anthropic.com/v1/messages', {
+  var res = await fetch(_AI_BASE + '/chat/completions', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + _AI_KEY
+    },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: _AI_MODEL,
       max_tokens: tokens,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }]
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user',   content: userPrompt   }
+      ]
     })
   });
   if (!res.ok) {
@@ -573,8 +582,8 @@ async function callClaude(systemPrompt, userPrompt, maxTokens) {
     throw new Error(errMsg);
   }
   var data = await res.json();
-  if (!data.content || !data.content.length) throw new Error('No content returned from API.');
-  return data.content.map(function(b){ return b.text || ''; }).join('');
+  if (!data.choices || !data.choices.length) throw new Error('No content returned from API.');
+  return data.choices[0].message.content || '';
 }
 
 /* ═══════════════════════════════
