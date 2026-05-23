@@ -1155,3 +1155,19 @@ async function getTimelineTips(loanType, state, totalDays, hoa, septic) {
         <strong>Disclaimer &amp; Terms:</strong> The digital tools, systems, frameworks, and matrices provided within this toolkit are for informational and business acceleration purposes only. Perryman’s Assets, LLC does not guarantee specific transaction volumes, income increases, or specific market performance. Unauthorized duplication, reverse-engineering, or digital scraping of this platform wrapper or its nested assets is strictly prohibited and will be prosecuted to the fullest extent of corporate trademark and property law. Transactions are securely managed off-site via PCI-Compliant Stripe architecture.
     </p>
 </footer>
+
+
+
+  <script>
+    // Disables right-click context menu
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    
+    // Disables keyboard shortcuts for viewing source (Ctrl+U, Ctrl+Shift+I, F12)
+    document.onkeydown = function(e) {
+        if (e.keyCode == 123) return false; // F12
+        if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+        if (e.ctrlKey && e.shiftKey && e.charCodeAt(0) == 'C') return false;
+        if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+        if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
+    }
+</script>
