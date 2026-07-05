@@ -206,20 +206,20 @@ footer span{color:var(--gold-dim);}
   <input type="text" inputmode="decimal" id="salePrice" placeholder="e.g. 485000" oninput="calcCommission()"/>
 
   <label class="fl">Total Commission Rate (%)</label>
-  <input type="number" id="commRate" placeholder="e.g. 6" step="0.1" min="0" max="100" oninput="calcCommission()"/>
+  <input type="text" inputmode="decimal" id="commRate" placeholder="e.g. 6" oninput="calcCommission()"/>
 
   <label class="fl">Commission Split — Listing Side (%)</label>
   <div class="row2">
     <div>
-      <input type="number" id="listSplit" placeholder="Listing agent % (e.g. 50)" step="1" min="0" max="100" oninput="calcCommission()"/>
+      <input type="text" inputmode="decimal" id="listSplit" placeholder="Listing agent % (e.g. 50)" oninput="calcCommission()"/>
     </div>
     <div>
-      <input type="number" id="buySplit" placeholder="Buyer agent % (e.g. 50)" step="1" min="0" max="100" oninput="calcCommission()"/>
+      <input type="text" inputmode="decimal" id="buySplit" placeholder="Buyer agent % (e.g. 50)" oninput="calcCommission()"/>
     </div>
   </div>
 
   <label class="fl">Your Agent-to-Broker Split (you keep %)</label>
-  <input type="number" id="agentSplit" placeholder="e.g. 80" step="1" min="0" max="100" oninput="calcCommission()"/>
+  <input type="text" inputmode="decimal" id="agentSplit" placeholder="e.g. 80" oninput="calcCommission()"/>
 
   <label class="fl">Transaction Fees &amp; Other Costs ($)</label>
   <input type="text" inputmode="decimal" id="fees" placeholder="e.g. 350" oninput="calcCommission()"/>
@@ -962,6 +962,13 @@ function parseCurrency(id) {
   var n = parseFloat(cleaned);
   return isNaN(n) ? 0 : n;
 }
+function parsePercent(id) {
+  var el = document.getElementById(id);
+  if (!el) return null;
+  var cleaned = (el.value || '').toString().replace(/%/g, '').trim();
+  var n = parseFloat(cleaned);
+  return isNaN(n) ? null : n;
+}
 function formatCurrencyValue(n) {
   if (isNaN(n)) return '';
   return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
@@ -969,9 +976,9 @@ function formatCurrencyValue(n) {
 
 function calcCommission() {
   var price  = parseCurrency('salePrice');
-  var rate   = parseFloat(document.getElementById('commRate').value)    || 0;
-  var list   = parseFloat(document.getElementById('listSplit').value)   || 50;
-  var agent  = parseFloat(document.getElementById('agentSplit').value)  || 80;
+  var rate   = parsePercent('commRate')   ?? 0;
+  var list   = parsePercent('listSplit')  ?? 50;
+  var agent  = parsePercent('agentSplit') ?? 80;
   var fees   = parseCurrency('fees');
   var gross     = price * rate / 100;
   var yourGross = gross * list / 100;
@@ -1614,9 +1621,10 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
 
   var MIC_SVG = '<svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3z"/><path d="M19 11a7 7 0 01-14 0"/><line x1="12" y1="18" x2="12" y2="22"/></svg>';
 
-  var numberFieldIds = ['commRate','listSplit','buySplit','agentSplit','offerDOM','commSqft','ldSqftCRE','offerLeaseTerm'];
+  var numberFieldIds = ['offerDOM','commSqft','ldSqftCRE','offerLeaseTerm'];
   var textFieldIds = ['mktSpecs','mktNeighborhood','offerAddr','offerClose','offerTerms','fuName','fuSituation','fuAgent','ldBedBath','ldSqft','ldFeatures','ldLocation','ohAddr','ohHighlights','ohDate','tlState','ldLeaseRate','offerBaseRent','offerCAM','offerTI'];
   var currencyFieldIds = ['salePrice','fees','offerAsk','offerPrice','ohBudget','noi','downPayment','debtService','mktPrice','ldPrice'];
+  var percentFieldIds = ['commRate','listSplit','buySplit','agentSplit'];
   var selectFieldIds = ['offerSide','offerMotivation','fuLeadType','fuTone','ldType','ldBuyer','ohVisitor','tlType','commPropType','ldBuildingClass','ldTypeCRE','ldBuyerCRE','ldLeaseType','offerDealType','fuLeadTypeCRE','ohVisitorCRE','tlTypeCRE'];
 
   var WORD_NUMS = {zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,
@@ -1778,6 +1786,19 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
         } else {
           status.className = 'mic-status'; status.textContent = 'Didn\'t catch an amount — tap to try again';
         }
+      } else if (kind === 'percent'){
+        var bestPct = null;
+        for (var p = 0; p < alts.length; p++){
+          var pn = parseSpokenNumber(alts[p].transcript.trim());
+          if (pn !== null){ bestPct = pn; break; }
+        }
+        if (bestPct !== null){
+          var pctFormatted = Number(bestPct) + '%';
+          el.value = pctFormatted; fireEvent(el,'input'); fireEvent(el,'change');
+          status.className = 'mic-status confirmed'; status.textContent = 'Set to ' + pctFormatted;
+        } else {
+          status.className = 'mic-status'; status.textContent = 'Didn\'t catch a percentage — tap to try again';
+        }
       } else {
         var transcript = alts[0].transcript.trim();
         el.value = el.value ? el.value + ', ' + transcript : transcript;
@@ -1854,6 +1875,7 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
     numberFieldIds.forEach(function(id){ addMic(document.getElementById(id), 'number'); });
     textFieldIds.forEach(function(id){ addMic(document.getElementById(id), 'text'); });
     currencyFieldIds.forEach(function(id){ addMic(document.getElementById(id), 'currency'); });
+    percentFieldIds.forEach(function(id){ addMic(document.getElementById(id), 'percent'); });
     selectFieldIds.forEach(function(id){ addMic(document.getElementById(id), 'select'); });
   });
 
@@ -1861,6 +1883,7 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
     numberFieldIds.forEach(function(id){ addMic(document.getElementById(id), 'number'); });
     textFieldIds.forEach(function(id){ addMic(document.getElementById(id), 'text'); });
     currencyFieldIds.forEach(function(id){ addMic(document.getElementById(id), 'currency'); });
+    percentFieldIds.forEach(function(id){ addMic(document.getElementById(id), 'percent'); });
     selectFieldIds.forEach(function(id){ addMic(document.getElementById(id), 'select'); });
   }
 })();
@@ -1873,9 +1896,10 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
   if (!listEl || !buyEl) return;
 
   function clamp(v){ return Math.max(0, Math.min(100, v)); }
+  function clean(v){ return parseFloat((v || '').toString().replace(/%/g, '').trim()); }
 
   listEl.addEventListener('input', function(){
-    var v = parseFloat(listEl.value);
+    var v = clean(listEl.value);
     if (!isNaN(v)){
       buyEl.value = clamp(100 - v);
       if (typeof calcCommission === 'function') calcCommission();
@@ -1883,7 +1907,7 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
   });
 
   buyEl.addEventListener('input', function(){
-    var v = parseFloat(buyEl.value);
+    var v = clean(buyEl.value);
     if (!isNaN(v)){
       listEl.value = clamp(100 - v);
       if (typeof calcCommission === 'function') calcCommission();
@@ -1987,6 +2011,29 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
         var n = parseFloat(cleaned);
         if (!isNaN(n)) {
           el.value = '$' + n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+        }
+      });
+    });
+  }
+  document.addEventListener('DOMContentLoaded', attach);
+  if (document.readyState === 'complete' || document.readyState === 'interactive') attach();
+})();
+</script>
+<script>
+/* ── PERCENT AUTO-FORMAT ON BLUR (added) — applies % formatting to manually typed values too ── */
+(function(){
+  var ids = ['commRate','listSplit','buySplit','agentSplit'];
+  function attach(){
+    ids.forEach(function(id){
+      var el = document.getElementById(id);
+      if (!el || el.dataset.percentBlurAttached) return;
+      el.dataset.percentBlurAttached = '1';
+      el.addEventListener('blur', function(){
+        var cleaned = (el.value || '').replace(/%/g, '').trim();
+        if (!cleaned) return;
+        var n = parseFloat(cleaned);
+        if (!isNaN(n)) {
+          el.value = n + '%';
         }
       });
     });
