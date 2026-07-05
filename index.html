@@ -151,6 +151,9 @@ footer span{color:var(--gold-dim);}
   50%{box-shadow:0 0 0 6px rgba(226,196,122,0),0 0 16px 6px rgba(226,196,122,.95);}
 }
 .voice-unsupported-note{font-size:.68rem;color:var(--muted);margin-top:6px;display:none;}
+.mic-status{font-size:.72rem;color:var(--muted);margin-top:6px;min-height:14px;line-height:1.4;}
+.mic-status.active{color:var(--gold-light);}
+.mic-status.confirmed{color:var(--green);}
 </style>
 </head>
 <body>
@@ -1225,39 +1228,114 @@ async function getTimelineTips(loanType, state, totalDays, hoa, septic) {
     btn.innerHTML = '<span class="mic-ico">'+MIC_SVG+'</span><span class="mic-bars"><span></span><span></span><span></span><span></span></span>';
     wrap.appendChild(btn);
 
-    btn.addEventListener('click', function(){
-      var rec = new SR();
-      rec.lang = 'en-US';
-      rec.interimResults = false;
-      rec.maxAlternatives = kind === 'text' ? 1 : 4;
-      btn.classList.add('listening');
-      try { rec.start(); } catch(e) { btn.classList.remove('listening'); return; }
+    var status = document.createElement('div');
+    status.className = 'mic-status';
+    wrap.appendChild(status);
 
-      rec.onresult = function(event){
-        var alts = event.results[0];
-        if (kind === 'select'){
-          var opts = Array.prototype.map.call(el.options, function(o){ return o.value; }).filter(Boolean);
-          var bestMatch = null;
-          for (var i = 0; i < alts.length; i++){
-            var m = fuzzyMatch(alts[i].transcript.trim(), opts);
-            if (m){ bestMatch = m; break; }
-          }
-          if (bestMatch){ el.value = bestMatch; fireEvent(el,'change'); fireEvent(el,'input'); }
-        } else if (kind === 'number'){
-          var bestNum = null;
-          for (var j = 0; j < alts.length; j++){
-            var n = parseSpokenNumber(alts[j].transcript.trim());
-            if (n !== null){ bestNum = n; break; }
-          }
-          if (bestNum !== null){ el.value = bestNum; fireEvent(el,'input'); fireEvent(el,'change'); }
+    var listening = false;
+    var rec = null;
+
+    function reset(){
+      listening = false;
+      btn.classList.remove('listening');
+      rec = null;
+    }
+
+    function applyResult(alts){
+      if (kind === 'select'){
+        var opts = Array.prototype.map.call(el.options, function(o){ return o.value; }).filter(Boolean);
+        var bestMatch = null;
+        for (var i = 0; i < alts.length; i++){
+          var m = fuzzyMatch(alts[i].transcript.trim(), opts);
+          if (m){ bestMatch = m; break; }
+        }
+        if (bestMatch){
+          el.value = bestMatch; fireEvent(el,'change'); fireEvent(el,'input');
+          status.className = 'mic-status confirmed'; status.textContent = 'Set to "'+bestMatch+'"';
         } else {
-          var transcript = alts[0].transcript.trim();
-          el.value = el.value ? el.value + ', ' + transcript : transcript;
-          fireEvent(el,'input'); fireEvent(el,'change');
+          status.className = 'mic-status'; status.textContent = 'No match — tap to try again';
+        }
+      } else if (kind === 'number'){
+        var bestNum = null;
+        for (var j = 0; j < alts.length; j++){
+          var n = parseSpokenNumber(alts[j].transcript.trim());
+          if (n !== null){ bestNum = n; break; }
+        }
+        if (bestNum !== null){
+          el.value = bestNum; fireEvent(el,'input'); fireEvent(el,'change');
+          status.className = 'mic-status confirmed'; status.textContent = 'Set to ' + bestNum;
+        } else {
+          status.className = 'mic-status'; status.textContent = 'Didn\'t catch a number — tap to try again';
+        }
+      } else {
+        var transcript = alts[0].transcript.trim();
+        el.value = el.value ? el.value + ', ' + transcript : transcript;
+        fireEvent(el,'input'); fireEvent(el,'change');
+        status.className = 'mic-status confirmed'; status.textContent = 'Added "' + transcript + '"';
+      }
+    }
+
+    function startListening(){
+      if (listening) return;
+      var r = new SR();
+      rec = r;
+      r.lang = 'en-US';
+      r.interimResults = true;
+      r.maxAlternatives = kind === 'text' ? 1 : 4;
+
+      listening = true;
+      btn.classList.add('listening');
+      status.className = 'mic-status active';
+      status.textContent = 'Listening…';
+
+      var launch = function(){
+        try { r.start(); }
+        catch(e){
+          try { r.abort(); } catch(e2){}
+          setTimeout(function(){
+            try { r.start(); } catch(e3){ reset(); status.className='mic-status'; status.textContent='Tap to try again'; }
+          }, 200);
         }
       };
-      rec.onerror = function(){ btn.classList.remove('listening'); };
-      rec.onend = function(){ btn.classList.remove('listening'); };
+      launch();
+
+      r.onresult = function(event){
+        var finalAlts = null, interimText = '';
+        for (var k = 0; k < event.results.length; k++){
+          if (event.results[k].isFinal) finalAlts = event.results[k];
+          else interimText += event.results[k][0].transcript;
+        }
+        if (finalAlts){
+          applyResult(finalAlts);
+        } else if (interimText) {
+          status.className = 'mic-status active';
+          status.textContent = interimText;
+        }
+      };
+
+      r.onerror = function(event){
+        if (event.error === 'no-speech'){
+          status.className = 'mic-status'; status.textContent = 'Didn\'t hear anything — tap to try again';
+        } else if (event.error === 'not-allowed' || event.error === 'permission-denied' || event.error === 'service-not-allowed'){
+          status.className = 'mic-status'; status.textContent = 'Mic permission blocked — check browser settings';
+        } else if (event.error !== 'aborted') {
+          status.className = 'mic-status'; status.textContent = 'Tap to try again';
+        }
+      };
+
+      r.onend = function(){
+        reset();
+      };
+    }
+
+    btn.addEventListener('click', function(){
+      if (listening){
+        if (rec) { try { rec.stop(); } catch(e){} }
+        reset();
+        status.className = 'mic-status';
+        return;
+      }
+      startListening();
     });
   }
 
