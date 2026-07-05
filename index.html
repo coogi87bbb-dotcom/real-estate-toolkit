@@ -914,6 +914,31 @@ function setMode(mode) {
     }
   }
 
+  var placeholderSwap = {
+    salePrice:      { res: 'e.g. 485000',                     cre: 'e.g. 2400000' },
+    commRate:       { res: 'e.g. 6',                          cre: 'e.g. 4' },
+    fees:           { res: 'e.g. 350',                        cre: 'e.g. 2500' },
+    mktSpecs:       { res: 'e.g. 4BR/3BA, 2,200 sqft, renovated kitchen, pool, corner lot, new roof 2023, 3-car garage...', cre: 'e.g. 45,000 SF industrial warehouse, 24ft clear height, 6 dock doors, ESFR sprinkler, built 2019...' },
+    mktNeighborhood:{ res: 'e.g. Buckhead Atlanta, first-time buyers, luxury investors...', cre: 'e.g. Perimeter submarket Atlanta, institutional investors, 1031 exchange buyers...' },
+    mktPrice:       { res: 'e.g. $525,000',                   cre: 'e.g. $4,200,000' },
+    offerAsk:       { res: 'e.g. 499000',                     cre: 'e.g. 3200000' },
+    offerPrice:     { res: 'e.g. 472000',                     cre: 'e.g. 3050000' },
+    offerAddr:      { res: 'e.g. 142 Maple St — 3BR/2BA ranch, 90 days on market', cre: 'e.g. 4500 Commerce Pkwy — 28,000 SF industrial, 60 days on market' },
+    offerClose:     { res: 'e.g. 30 days, 45 days, flexible', cre: 'e.g. 60 days, 90 days, subject to financing' },
+    offerTerms:     { res: 'e.g. seller pays closing costs, include appliances, leaseback 30 days, as-is...', cre: 'e.g. seller credit for TI, extended due diligence period, seller financing option, as-is...' },
+    fuSituation:    { res: 'e.g. Pre-approved for $420K, looking in Midtown, saw 3 homes last week, price is main concern, lease ends in 4 months...', cre: 'e.g. 1031 exchange from a $2.1M sale, needs like-kind property within 45 days, focused on NNN retail with 5+ year lease remaining...' },
+    ldPrice:        { res: 'e.g. $649,000',                   cre: 'e.g. $3,750,000 or $24.50/SF/yr NNN' },
+    ohAddr:         { res: 'e.g. 318 Oak Blvd — 4BR colonial, $549K, Roswell GA', cre: 'e.g. 4500 Commerce Pkwy — 28,000 SF industrial, $3.2M, Roswell GA' },
+    ohHighlights:   { res: 'e.g. Just renovated, new roof, best school district in county, huge backyard, priced $30K below comps...', cre: 'e.g. 24ft clear height, 6 dock-high doors, ESFR sprinkler, 3-phase power, priced below replacement cost...' },
+    ohBudget:       { res: 'e.g. 500',                        cre: 'e.g. 1500' },
+    ohDate:         { res: 'e.g. Sat May 31, 1–4 PM',         cre: 'e.g. Tues Jun 10, 10 AM–12 PM (Broker Preview)' },
+    tlState:        { res: 'e.g. Georgia, Texas, Florida...', cre: 'e.g. Georgia, Texas, Florida... (zoning/entitlement timelines vary by municipality)' }
+  };
+  Object.keys(placeholderSwap).forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.placeholder = mode === 'commercial' ? placeholderSwap[id].cre : placeholderSwap[id].res;
+  });
+
   if (typeof calcCommission === 'function') calcCommission();
 
   try { localStorage.setItem('creMode', mode); } catch(e){}
@@ -987,7 +1012,7 @@ async function runMarketing() {
       'Price: ' + (price || 'not specified') + '\n\n' +
       'Generate exactly 4 sections. Use these EXACT section labels on their own line:\n\n' +
       '[SEO STRATEGY]\n' +
-      'Write 5 high-converting SEO & GEO keywords for this property on LoopNet/CoStar-style platforms, then write a 90-word SEO & GEO meta description that leads with the key investment metric or building spec.\n\n' +
+      'Write 5 high-converting SEO keywords for this property on LoopNet/CoStar-style platforms, then write a 90-word SEO meta description that leads with the key investment metric or building spec.\n\n' +
       '[MARKET POSITIONING PITCH]\n' +
       'Write a 100-word market positioning pitch for a broker opinion of value or offering memorandum. Why does this asset beat comparable properties right now?\n\n' +
       '[INVESTOR ROI ANGLE]\n' +
@@ -1002,7 +1027,7 @@ async function runMarketing() {
       'Listing Price: ' + (price || 'not specified') + '\n\n' +
       'Generate exactly 4 sections. Use these EXACT section labels on their own line:\n\n' +
       '[SEO STRATEGY]\n' +
-      'Write 5 high-converting SEO & GEO keywords for this property, then write a 90-word SEO & GEO meta description optimized for Zillow, Realtor.com, and Google.\n\n' +
+      'Write 5 high-converting SEO keywords for this property, then write a 90-word SEO meta description optimized for Zillow, Realtor.com, and Google.\n\n' +
       '[MARKET POSITIONING PITCH]\n' +
       'Write a 100-word market positioning pitch for listing presentations. Why does this home beat its competition right now?\n\n' +
       '[BUYER PROFIT ROI ANGLE]\n' +
@@ -1270,7 +1295,7 @@ async function runListing() {
       '[HEADLINE OPTIONS]\n' +
       'Write 5 compelling marketing headline options, numbered 1 through 5, for flyers and broker cold emails.\n\n' +
       '[SEO SCORE]\n' +
-      'Rate this listing description\'s SEO & GEO strength from 1 to 10 for commercial listing platforms. List the top 5 keywords naturally embedded. Explain specifically what would push the score higher.';
+      'Rate this listing description\'s SEO strength from 1 to 10 for commercial listing platforms. List the top 5 keywords naturally embedded. Explain specifically what would push the score higher.';
   } else {
     var bedBath  = document.getElementById('ldBedBath').value.trim() || 'not specified';
     var sqft     = document.getElementById('ldSqft').value.trim();
@@ -1295,7 +1320,7 @@ async function runListing() {
       '[HEADLINE OPTIONS]\n' +
       'Write 5 compelling marketing headline options, numbered 1 through 5. These are for flyers, ads, and social posts.\n\n' +
       '[SEO SCORE]\n' +
-      'Rate this listing description\'s SEO & GEO strength from 1 to 10. List the top 5 keywords naturally embedded in the description. Explain specifically what would push the score higher.';
+      'Rate this listing description\'s SEO strength from 1 to 10. List the top 5 keywords naturally embedded in the description. Explain specifically what would push the score higher.';
   }
 
   try {
@@ -1840,6 +1865,19 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
 </script>
 </body>
 </html>
+
+
+<div style="max-width: 800px; margin: 40px auto; padding: 30px; background: linear-gradient(to bottom, #18181b, #000000); border: 2px solid #d4af37; border-radius: 12px; text-align: center; font-family: sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+    <span style="font-size: 11px; font-family: monospace; color: #d4af37; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 8px;">⚜️ PREMIUM ENTERPRISE PLACEMENT</span>
+    <h3 style="font-size: 22px; font-weight: bold; color: #ffffff; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px 0;">Want Absolute Local Market Monopoly?</h3>
+    <p style="font-size: 13px; color: #a1a1aa; max-width: 600px; margin: 0 auto 20px auto; line-height: 1.6;">
+        We build completely automated local SEO infrastructure, execute advanced search keyword tracking, and manage full-scale marketing distribution campaigns for elite real estate firms.
+    </p>
+    <a href="https://docs.google.com/forms/d/1ofLBY7eHXGKhDoFuKb1zXgw7xuAZt-h6tzGuXfRSp68/preview" target="_blank" style="display: inline-block; padding: 10px 24px; background: transparent; border: 2px solid #d4af37; color: #d4af37; font-size: 12px; font-family: monospace; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; border-radius: 4px; transition: 0.2s;">
+        Apply for Dedicated Regional Management →
+    </a>
+</div>
+
 
 
 <div style="max-width: 800px; margin: 40px auto; padding: 30px; background: #d4af37; border: 2px solid #aa8423; border-radius: 12px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
