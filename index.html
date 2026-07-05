@@ -1141,18 +1141,70 @@ async function getTimelineTips(loanType, state, totalDays, hoa, septic) {
     eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,
     twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
 
-  function parseSpokenNumber(t){
-    var cleaned = t.toLowerCase().replace(/[$,]/g,'').trim();
-    var digitsOnly = cleaned.replace(/[^0-9.]/g,'');
-    if (digitsOnly && /\d/.test(digitsOnly)) return digitsOnly;
-    var words = cleaned.split(/\s+|-/).filter(Boolean);
+  function wordsToInt(words){
     var total = 0, current = 0, found = false;
     words.forEach(function(w){
       if (WORD_NUMS.hasOwnProperty(w)) { current += WORD_NUMS[w]; found = true; }
       else if (w === 'hundred') { current = (current || 1) * 100; found = true; }
       else if (w === 'thousand') { total += (current || 1) * 1000; current = 0; found = true; }
       else if (w === 'million') { total += (current || 1) * 1000000; current = 0; found = true; }
-      else if (w === 'percent' || w === 'point') { /* ignore filler */ }
+      else if (w === 'billion') { total += (current || 1) * 1000000000; current = 0; found = true; }
+    });
+    total += current;
+    return found ? total : null;
+  }
+
+  function parseSpokenNumber(t){
+    var s = t.toLowerCase()
+      .replace(/\$/g,'')
+      .replace(/,/g,'')
+      .replace(/\bdollars?\b/g,'')
+      .replace(/\bbucks\b/g,'')
+      .replace(/\band\b/g,' ')
+      .replace(/\bpercent\b/g,'')
+      .replace(/-/g,' ')
+      .trim();
+
+    var scaleMap = {thousand:1e3, grand:1e3, k:1e3, million:1e6, billion:1e9};
+
+    if (/\bpoint\b/.test(s)) {
+      var parts = s.split(/\bpoint\b/);
+      var beforeWords = parts[0].trim().split(/\s+/).filter(Boolean);
+      var afterWords = (parts[1]||'').trim().split(/\s+/).filter(Boolean);
+
+      var scaleWord = null;
+      if (afterWords.length && scaleMap.hasOwnProperty(afterWords[afterWords.length-1])) {
+        scaleWord = afterWords.pop();
+      }
+
+      var intPart = wordsToInt(beforeWords);
+      var fracDigits = '';
+      afterWords.forEach(function(w){
+        if (WORD_NUMS.hasOwnProperty(w) && WORD_NUMS[w] < 10) fracDigits += String(WORD_NUMS[w]);
+      });
+
+      if (intPart !== null || fracDigits) {
+        var val = parseFloat((intPart !== null ? intPart : 0) + '.' + (fracDigits || '0'));
+        if (scaleWord) val *= scaleMap[scaleWord];
+        return String(Math.round(val));
+      }
+    }
+
+    var digitScaleMatch = s.match(/(\d+(?:\.\d+)?)\s*(thousand|grand|million|billion|k)?/);
+    if (digitScaleMatch && digitScaleMatch[1]) {
+      var n = parseFloat(digitScaleMatch[1]);
+      if (digitScaleMatch[2]) n *= scaleMap[digitScaleMatch[2]];
+      if (!isNaN(n)) return String(Math.round(n));
+    }
+
+    var words = s.split(/\s+/).filter(Boolean);
+    var total = 0, current = 0, found = false;
+    words.forEach(function(w){
+      if (WORD_NUMS.hasOwnProperty(w)) { current += WORD_NUMS[w]; found = true; }
+      else if (w === 'hundred') { current = (current || 1) * 100; found = true; }
+      else if (w === 'thousand' || w === 'grand') { total += (current || 1) * 1000; current = 0; found = true; }
+      else if (w === 'million') { total += (current || 1) * 1000000; current = 0; found = true; }
+      else if (w === 'billion') { total += (current || 1) * 1000000000; current = 0; found = true; }
     });
     total += current;
     return found ? String(total) : null;
@@ -1196,20 +1248,29 @@ async function getTimelineTips(loanType, state, totalDays, hoa, septic) {
       var rec = new SR();
       rec.lang = 'en-US';
       rec.interimResults = false;
-      rec.maxAlternatives = 1;
+      rec.maxAlternatives = kind === 'text' ? 1 : 4;
       btn.classList.add('listening');
       try { rec.start(); } catch(e) { btn.classList.remove('listening'); return; }
 
       rec.onresult = function(event){
-        var transcript = event.results[0][0].transcript.trim();
+        var alts = event.results[0];
         if (kind === 'select'){
           var opts = Array.prototype.map.call(el.options, function(o){ return o.value; }).filter(Boolean);
-          var match = fuzzyMatch(transcript, opts);
-          if (match){ el.value = match; fireEvent(el,'change'); fireEvent(el,'input'); }
+          var bestMatch = null;
+          for (var i = 0; i < alts.length; i++){
+            var m = fuzzyMatch(alts[i].transcript.trim(), opts);
+            if (m){ bestMatch = m; break; }
+          }
+          if (bestMatch){ el.value = bestMatch; fireEvent(el,'change'); fireEvent(el,'input'); }
         } else if (kind === 'number'){
-          var num = parseSpokenNumber(transcript);
-          if (num !== null){ el.value = num; fireEvent(el,'input'); fireEvent(el,'change'); }
+          var bestNum = null;
+          for (var j = 0; j < alts.length; j++){
+            var n = parseSpokenNumber(alts[j].transcript.trim());
+            if (n !== null){ bestNum = n; break; }
+          }
+          if (bestNum !== null){ el.value = bestNum; fireEvent(el,'input'); fireEvent(el,'change'); }
         } else {
+          var transcript = alts[0].transcript.trim();
           el.value = el.value ? el.value + ', ' + transcript : transcript;
           fireEvent(el,'input'); fireEvent(el,'change');
         }
@@ -1299,17 +1360,70 @@ async function getTimelineTips(loanType, state, totalDays, hoa, septic) {
     eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,
     twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
 
-  function parseSpokenNumber(t){
-    var cleaned = t.toLowerCase().replace(/[$,]/g,'').trim();
-    var digitsOnly = cleaned.replace(/[^0-9.]/g,'');
-    if (digitsOnly && /\d/.test(digitsOnly)) return digitsOnly;
-    var words = cleaned.split(/\s+|-/).filter(Boolean);
+  function wordsToInt(words){
     var total = 0, current = 0, found = false;
     words.forEach(function(w){
       if (WORD_NUMS.hasOwnProperty(w)) { current += WORD_NUMS[w]; found = true; }
       else if (w === 'hundred') { current = (current || 1) * 100; found = true; }
       else if (w === 'thousand') { total += (current || 1) * 1000; current = 0; found = true; }
       else if (w === 'million') { total += (current || 1) * 1000000; current = 0; found = true; }
+      else if (w === 'billion') { total += (current || 1) * 1000000000; current = 0; found = true; }
+    });
+    total += current;
+    return found ? total : null;
+  }
+
+  function parseSpokenNumber(t){
+    var s = t.toLowerCase()
+      .replace(/\$/g,'')
+      .replace(/,/g,'')
+      .replace(/\bdollars?\b/g,'')
+      .replace(/\bbucks\b/g,'')
+      .replace(/\band\b/g,' ')
+      .replace(/\bpercent\b/g,'')
+      .replace(/-/g,' ')
+      .trim();
+
+    var scaleMap = {thousand:1e3, grand:1e3, k:1e3, million:1e6, billion:1e9};
+
+    if (/\bpoint\b/.test(s)) {
+      var parts = s.split(/\bpoint\b/);
+      var beforeWords = parts[0].trim().split(/\s+/).filter(Boolean);
+      var afterWords = (parts[1]||'').trim().split(/\s+/).filter(Boolean);
+
+      var scaleWord = null;
+      if (afterWords.length && scaleMap.hasOwnProperty(afterWords[afterWords.length-1])) {
+        scaleWord = afterWords.pop();
+      }
+
+      var intPart = wordsToInt(beforeWords);
+      var fracDigits = '';
+      afterWords.forEach(function(w){
+        if (WORD_NUMS.hasOwnProperty(w) && WORD_NUMS[w] < 10) fracDigits += String(WORD_NUMS[w]);
+      });
+
+      if (intPart !== null || fracDigits) {
+        var val = parseFloat((intPart !== null ? intPart : 0) + '.' + (fracDigits || '0'));
+        if (scaleWord) val *= scaleMap[scaleWord];
+        return String(Math.round(val));
+      }
+    }
+
+    var digitScaleMatch = s.match(/(\d+(?:\.\d+)?)\s*(thousand|grand|million|billion|k)?/);
+    if (digitScaleMatch && digitScaleMatch[1]) {
+      var n = parseFloat(digitScaleMatch[1]);
+      if (digitScaleMatch[2]) n *= scaleMap[digitScaleMatch[2]];
+      if (!isNaN(n)) return String(Math.round(n));
+    }
+
+    var words = s.split(/\s+/).filter(Boolean);
+    var total = 0, current = 0, found = false;
+    words.forEach(function(w){
+      if (WORD_NUMS.hasOwnProperty(w)) { current += WORD_NUMS[w]; found = true; }
+      else if (w === 'hundred') { current = (current || 1) * 100; found = true; }
+      else if (w === 'thousand' || w === 'grand') { total += (current || 1) * 1000; current = 0; found = true; }
+      else if (w === 'million') { total += (current || 1) * 1000000; current = 0; found = true; }
+      else if (w === 'billion') { total += (current || 1) * 1000000000; current = 0; found = true; }
     });
     total += current;
     return found ? String(total) : null;
