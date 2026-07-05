@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>The Deal Closer AI — Full Arsenal</title>
+<title>Save Time Save Money — Full Arsenal</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -195,7 +195,7 @@ footer span{color:var(--gold-dim);}
 <div id="panel-marketing" class="panel">
 <div class="card">
   <div class="card-title">📣 AI Marketing &amp; Strategy Engine</div>
-  <div class="card-desc">Full specialist package: SEO strategy, market pitch, buyer ROI angle, and viral social script — all generated at once.</div>
+  <div class="card-desc">Full specialist package: SEO and GEO strategy, market pitch, buyer ROI angle, and viral social script — all generated at once.</div>
 
   <label class="fl">Property Specs &amp; Key Assets</label>
   <textarea id="mktSpecs" placeholder="e.g. 4BR/3BA, 2,200 sqft, renovated kitchen, pool, corner lot, new roof 2023, 3-car garage..."></textarea>
@@ -330,7 +330,7 @@ footer span{color:var(--gold-dim);}
 <div id="panel-listing" class="panel">
 <div class="card">
   <div class="card-title">🏠 Listing Description Generator <span class="badge-new">NEW</span></div>
-  <div class="card-desc">MLS-optimized listing copy with SEO scoring. Turn 60 seconds of input into a description that stops scrollers and pulls the right buyer in.</div>
+  <div class="card-desc">MLS-optimized listing copy with SEO and GEO scoring. Turn 60 seconds of input into a description that stops scrollers and pulls the right buyer in.</div>
 
   <div class="row2">
     <div>
@@ -372,7 +372,7 @@ footer span{color:var(--gold-dim);}
   <label class="fl">Listing Price</label>
   <input type="text" id="ldPrice" placeholder="e.g. $649,000"/>
 
-  <button class="btn btn-gold" id="ldBtn" onclick="runListing()">✍️ Generate MLS Listing + SEO Score</button>
+  <button class="btn btn-gold" id="ldBtn" onclick="runListing()">✍️ Generate MLS Listing + SEO & GEO Score</button>
   <div class="lbox" id="ldLoading"><div class="spinner"></div><p>Crafting your listing masterpiece...</p></div>
   <div id="ldResults"></div>
 </div>
@@ -639,7 +639,7 @@ async function runMarketing() {
   showLoading('mktLoading');
   clearEl('mktResults');
 
-  var system = 'You are a real estate marketing specialist with 40 years of experience and over $2 billion in sales. You have mastered SEO, social media, luxury positioning, and buyer psychology. Respond in plain text only. Do not use markdown, asterisks, pound signs, or bullet hyphens.';
+  var system = 'You are a highly gifted real estate marketing genius with 40 years of experience and over $2 billion in sales. You have mastered SEO and GEO social media, luxury positioning, and buyer psychology. Respond in plain text only. Do not use markdown, asterisks, pound signs, or bullet hyphens.';
 
   var prompt = 'Property: ' + specs + '\n' +
     'Neighborhood/Target Market: ' + (nbhd || 'not specified') + '\n' +
@@ -703,7 +703,7 @@ async function runOffer() {
   showLoading('offerLoading');
   clearEl('offerResults');
 
-  var system = 'You are a master real estate negotiator with 40 years of experience and over 3,000 closed transactions. You know every psychological and tactical lever in a real estate deal. You have coached hundreds of agents on negotiation. Respond in plain text only. No markdown, no asterisks, no pound signs.';
+  var system = 'You are a highly gifted master genius real estate negotiator with 40 years of experience and over 3,000 closed transactions. You know every psychological and tactical lever in a real estate deal. You have coached hundreds of agents on negotiation. Respond in plain text only. No markdown, no asterisks, no pound signs.';
 
   var prompt = 'I am representing the ' + side + '.\n' +
     'Property: ' + addr + '\n' +
@@ -760,7 +760,7 @@ async function runFollowUp() {
   hideEl('fuResults');
   _emails = [];
 
-  var system = 'You are a top real estate agent with 40 years of experience and deep mastery of client psychology. You write emails that feel genuinely personal, never templated. Your sequences convert leads at 3x the industry average. Respond in plain text only. No markdown, no asterisks, no pound signs.';
+  var system = 'You are a highly gifted master genius real estate agent with 40 years of experience and deep mastery of client psychology. You write emails that feel genuinely personal, never templated. Your sequences convert leads at 3x the industry average. Respond in plain text only. No markdown, no asterisks, no pound signs.';
 
   // Use numbered delimiters that are highly reliable to parse
   var prompt = 'Client name: ' + clientName + '\n' +
@@ -856,7 +856,7 @@ async function runListing() {
   showLoading('ldLoading');
   clearEl('ldResults');
 
-  var system = 'You are a master real estate copywriter with 40 years of experience. Your listing descriptions consistently sell homes faster and above asking price. You understand buyer psychology, SEO optimization for property platforms, and how to create emotional urgency in copy. Respond in plain text only. No markdown, no asterisks, no pound signs.';
+  var system = 'You are a highly gifted master genius real estate copywriter with 40 years of experience. Your listing descriptions consistently sell homes faster and above asking price. You understand buyer psychology, SEO and GEO optimization for property platforms, and how to create emotional urgency in copy. Respond in plain text only. No markdown, no asterisks, no pound signs.';
 
   var prompt = 'Property details:\n' +
     'Beds/Baths: ' + bedBath + '\n' +
@@ -911,7 +911,7 @@ async function runOpenHouse() {
   showLoading('ohLoading');
   clearEl('ohResults');
 
-  var system = 'You are an elite real estate agent with 40 years of experience specializing in open house strategy. You have hosted over 4,000 open houses and convert leads at 3x the national average. You know instantly how to read visitors, qualify serious buyers, and convert tire-kickers. Respond in plain text only. No markdown, no asterisks, no pound signs.';
+  var system = 'You are an 1% highly gifted elite genius real estate agent with 40 years of experience specializing in open house strategy. You have hosted over 4,000 open houses and convert leads at 3x the national average. You know instantly how to read visitors, qualify serious buyers, and convert tire-kickers. Respond in plain text only. No markdown, no asterisks, no pound signs.';
 
   var prompt = 'Property: ' + addr + '\n' +
     'Key Highlights: ' + highlights + '\n' +
@@ -1048,7 +1048,7 @@ async function getTimelineTips(loanType, state, totalDays, hoa, septic) {
   showLoading('tlLoading');
   clearEl('tlAIResults');
 
-  var system = 'You are a real estate transaction coordinator and licensed broker with 40 years of experience and thousands of closed deals across all 50 states. Respond in plain text only. No markdown, no asterisks, no pound signs.';
+  var system = 'You are a highly gifted genius real estate transaction coordinator and licensed broker with 40 years of experience and thousands of closed deals across all 50 states. Respond in plain text only. No markdown, no asterisks, no pound signs.';
 
   var extras = [];
   if (hoa)    extras.push('HOA approval required');
