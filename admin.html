@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Deal Closer AI</title>
+<meta name="robots" content="noindex, nofollow">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --gold:#C9A84C; --gold-light:#E2C47A; --gold-dim:#8a6f2e;
+    --black:#0A0A0A; --dark:#111111; --card:#161616; --card2:#1C1C1C;
+    --border:#2a2a2a; --text:#E8E2D6; --muted:#888;
+    --red:#e05252; --green:#52c48a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--black); color: var(--text);
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    min-height: 100vh; padding: 24px;
+  }
+  h1 { font-size: 1.4rem; font-weight: 700; color: var(--gold-light); margin-bottom: 4px; }
+  .subtitle { font-size: 0.8rem; color: var(--muted); margin-bottom: 28px; }
+
+  /* Login gate */
+  #loginScreen {
+    max-width: 360px; margin: 15vh auto; text-align: center;
+  }
+  #loginScreen input {
+    width: 100%; background: var(--card2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px; color: var(--text);
+    font-size: 0.9rem; margin-bottom: 12px;
+  }
+  #loginScreen button {
+    width: 100%; background: var(--gold); color: #000; border: none;
+    border-radius: 10px; padding: 12px; font-weight: 700; font-size: 0.9rem;
+    cursor: pointer;
+  }
+  #loginError { color: var(--red); font-size: 0.8rem; margin-top: 10px; min-height: 16px; }
+
+  /* Dashboard */
+  #dashboard { display: none; max-width: 1100px; margin: 0 auto; }
+  .stat-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px; margin-bottom: 28px;
+  }
+  .stat-box {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px; text-align: center;
+  }
+  .stat-lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .stat-val { font-size: 1.6rem; font-weight: 700; color: var(--gold-light); }
+  .stat-val.green { color: var(--green); }
+
+  .chart-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; margin-bottom: 20px;
+  }
+  .chart-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 14px; color: var(--gold-light); }
+  .chart-wrap { position: relative; height: 260px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 720px) { .two-col { grid-template-columns: 1fr; } }
+
+  #logoutBtn {
+    position: fixed; top: 20px; right: 20px; background: var(--card2);
+    border: 1px solid var(--border); color: var(--muted); padding: 8px 14px;
+    border-radius: 8px; font-size: 0.75rem; cursor: pointer;
+  }
+  .loading-msg { text-align: center; color: var(--muted); padding: 60px 0; }
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <h1>⚜️ Admin Access</h1>
+  <p class="subtitle">Deal Closer AI — Private Dashboard</p>
+  <input type="email" id="loginEmail" placeholder="Email">
+  <input type="password" id="loginPassword" placeholder="Password">
+  <button onclick="doLogin()">Sign In</button>
+  <div id="loginError"></div>
+</div>
+
+<button id="logoutBtn" style="display:none;" onclick="doLogout()">Sign Out</button>
+
+<div id="dashboard">
+  <h1>📊 Performance Dashboard</h1>
+  <p class="subtitle">Last 30 days — updates on page load</p>
+
+  <div id="loadingMsg" class="loading-msg">Loading analytics...</div>
+
+  <div id="dashboardContent" style="display:none;">
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-lbl">Total Page Views</div><div class="stat-val" id="statPageViews">0</div></div>
+      <div class="stat-box"><div class="stat-lbl">Unique Sessions</div><div class="stat-val" id="statSessions">0</div></div>
+      <div class="stat-box"><div class="stat-lbl">Tool Runs</div><div class="stat-val" id="statToolRuns">0</div></div>
+      <div class="stat-box"><div class="stat-lbl">Stripe Clicks</div><div class="stat-val" id="statStripeClicks">0</div></div>
+      <div class="stat-box"><div class="stat-lbl">Revenue (90d)</div><div class="stat-val green" id="statRevenue">$0</div></div>
+      <div class="stat-box"><div class="stat-lbl">Conv. Rate</div><div class="stat-val green" id="statConvRate">0%</div></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">📈 Daily Traffic (Page Views)</div>
+      <div class="chart-wrap"><canvas id="trafficChart"></canvas></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">💰 Daily Revenue</div>
+      <div class="chart-wrap"><canvas id="revenueChart"></canvas></div>
+    </div>
+
+    <div class="two-col">
+      <div class="chart-card">
+        <div class="chart-title">🛠️ Tool Usage Breakdown</div>
+        <div class="chart-wrap"><canvas id="toolChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">🏡 vs 🏢 Mode Split</div>
+        <div class="chart-wrap"><canvas id="modeChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, query, where, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ─── PASTE YOUR FIREBASE CONFIG HERE (same as tracking-snippet.html) ───
+  const firebaseConfig = {
+    apiKey: "AIzaSyDqYi0nazNaezL7j3Vg6TvfJzJq11TI6rQ",
+    authDomain: "ailogflow.firebaseapp.com",
+    projectId: "ailogflow",
+    storageBucket: "ailogflow.firebasestorage.app",
+    messagingSenderId: "1090825955693",
+    appId: "1:1090825955693:web:807e0807cae2e0e0c2d264"
+  };
+  const ADMIN_UID = "88KEcdPBNgWH9ugnpTEUMVTb9Ku1"; // Firebase Authentication → Users → your UID
+
+  // ─── PASTE YOUR VERCEL STRIPE FUNCTION URL HERE ───
+  const STRIPE_SUMMARY_URL = "https://your-project.vercel.app/api/stripe-summary";
+  // ────────────────────────────────────────────────────
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  window.doLogin = async function() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const errEl = document.getElementById('loginError');
+    errEl.textContent = '';
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (e) {
+      errEl.textContent = 'Login failed — check your email and password.';
+    }
+  };
+
+  window.doLogout = function() {
+    signOut(auth);
+  };
+
+  onAuthStateChanged(auth, function(user) {
+    if (user && user.uid === ADMIN_UID) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'block';
+      document.getElementById('dashboard').style.display = 'block';
+      loadDashboard();
+    } else if (user) {
+      // Logged in but not the admin account
+      document.getElementById('loginError').textContent = 'This account is not authorized.';
+      signOut(auth);
+    } else {
+      document.getElementById('loginScreen').style.display = 'block';
+      document.getElementById('logoutBtn').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'none';
+    }
+  });
+
+  async function loadDashboard() {
+    var thirtyDaysAgo = Timestamp.fromDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
+    var q = query(collection(db, 'events'), where('timestamp', '>=', thirtyDaysAgo));
+    var snap = await getDocs(q);
+
+    var events = [];
+    snap.forEach(function(doc){ events.push(doc.data()); });
+
+    // Aggregate
+    var pageViewsByDay = {};
+    var sessions = new Set();
+    var toolCounts = {};
+    var modeCounts = { residential: 0, commercial: 0 };
+    var stripeClicks = 0;
+    var totalPageViews = 0;
+
+    events.forEach(function(e){
+      if (!e.timestamp) return;
+      var day = new Date(e.timestamp.seconds * 1000).toISOString().slice(0, 10);
+      if (e.sessionId) sessions.add(e.sessionId);
+
+      if (e.type === 'page_view') {
+        totalPageViews++;
+        pageViewsByDay[day] = (pageViewsByDay[day] || 0) + 1;
+      }
+      if (e.type === 'tool_used' && e.tool) {
+        toolCounts[e.tool] = (toolCounts[e.tool] || 0) + 1;
+      }
+      if (e.type === 'mode_toggle' && e.newMode) {
+        modeCounts[e.newMode] = (modeCounts[e.newMode] || 0) + 1;
+      }
+      if (e.mode === 'commercial') modeCounts.commercial++; else modeCounts.residential++;
+      if (e.type === 'stripe_click') stripeClicks++;
+    });
+
+    var totalToolRuns = Object.values(toolCounts).reduce(function(a,b){ return a+b; }, 0);
+
+    document.getElementById('statPageViews').textContent = totalPageViews.toLocaleString();
+    document.getElementById('statSessions').textContent = sessions.size.toLocaleString();
+    document.getElementById('statToolRuns').textContent = totalToolRuns.toLocaleString();
+    document.getElementById('statStripeClicks').textContent = stripeClicks.toLocaleString();
+    document.getElementById('statConvRate').textContent = totalPageViews > 0
+      ? ((stripeClicks / totalPageViews) * 100).toFixed(1) + '%' : '0%';
+
+    // Traffic chart
+    var sortedDays = Object.keys(pageViewsByDay).sort();
+    new Chart(document.getElementById('trafficChart'), {
+      type: 'line',
+      data: {
+        labels: sortedDays,
+        datasets: [{
+          label: 'Page Views',
+          data: sortedDays.map(function(d){ return pageViewsByDay[d]; }),
+          borderColor: '#C9A84C', backgroundColor: 'rgba(201,168,76,0.1)',
+          tension: 0.3, fill: true
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false,
+        scales: { x: { ticks: { color: '#888' }, grid: { color: '#2a2a2a' } },
+                  y: { ticks: { color: '#888' }, grid: { color: '#2a2a2a' } } },
+        plugins: { legend: { labels: { color: '#E8E2D6' } } } }
+    });
+
+    // Tool usage chart
+    var toolLabels = Object.keys(toolCounts);
+    new Chart(document.getElementById('toolChart'), {
+      type: 'bar',
+      data: {
+        labels: toolLabels.length ? toolLabels : ['No data yet'],
+        datasets: [{
+          label: 'Uses',
+          data: toolLabels.length ? toolLabels.map(function(t){ return toolCounts[t]; }) : [0],
+          backgroundColor: '#C9A84C'
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false,
+        scales: { x: { ticks: { color: '#888' }, grid: { display: false } },
+                  y: { ticks: { color: '#888' }, grid: { color: '#2a2a2a' } } },
+        plugins: { legend: { display: false } } }
+    });
+
+    // Mode split chart
+    new Chart(document.getElementById('modeChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Residential', 'Commercial'],
+        datasets: [{
+          data: [modeCounts.residential, modeCounts.commercial],
+          backgroundColor: ['#E2C47A', '#8a6f2e']
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#E8E2D6' } } } }
+    });
+
+    // Revenue (from Vercel/Stripe function)
+    try {
+      var resp = await fetch(STRIPE_SUMMARY_URL);
+      var stripeData = await resp.json();
+
+      document.getElementById('statRevenue').textContent = '$' + (stripeData.totalRevenue || 0).toLocaleString();
+
+      var revDays = (stripeData.dailySeries || []).map(function(d){ return d.date; });
+      var revAmounts = (stripeData.dailySeries || []).map(function(d){ return d.revenue; });
+
+      new Chart(document.getElementById('revenueChart'), {
+        type: 'bar',
+        data: {
+          labels: revDays.length ? revDays : ['No data yet'],
+          datasets: [{
+            label: 'Revenue ($)',
+            data: revDays.length ? revAmounts : [0],
+            backgroundColor: '#52c48a'
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false,
+          scales: { x: { ticks: { color: '#888' }, grid: { display: false } },
+                    y: { ticks: { color: '#888' }, grid: { color: '#2a2a2a' } } },
+          plugins: { legend: { display: false } } }
+      });
+    } catch (e) {
+      console.warn('Stripe summary unavailable:', e);
+    }
+
+    document.getElementById('loadingMsg').style.display = 'none';
+    document.getElementById('dashboardContent').style.display = 'block';
+  }
+</script>
+
+</body>
+</html>
