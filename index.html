@@ -1864,6 +1864,87 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
   });
 })();
 </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDqYi0nazNaezL7j3Vg6TvfJzJq11TI6rQ",
+    authDomain: "ailogflow.firebaseapp.com",
+    projectId: "ailogflow",
+    storageBucket: "ailogflow.firebasestorage.app",
+    messagingSenderId: "1090825955693",
+    appId: "1:1090825955693:web:807e0807cae2e0e0c2d264"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  function getSessionId() {
+    let sid = sessionStorage.getItem('dc_sid');
+    if (!sid) {
+      sid = 'sid_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+      sessionStorage.setItem('dc_sid', sid);
+    }
+    return sid;
+  }
+
+  function logEvent(type, data) {
+    try {
+      addDoc(collection(db, 'events'), {
+        type: type,
+        sessionId: getSessionId(),
+        mode: document.body.classList.contains('mode-commercial') ? 'commercial' : 'residential',
+        path: window.location.pathname,
+        referrer: document.referrer || null,
+        timestamp: serverTimestamp(),
+        ...data
+      }).catch(function(e){});
+    } catch(e) {}
+  }
+
+  logEvent('page_view', {});
+
+  var toolButtons = {
+    'mktBtn':   'marketing',
+    'offerBtn': 'offer',
+    'fuBtn':    'followup',
+    'ldBtn':    'listing',
+    'ohBtn':    'openhouse'
+  };
+  Object.keys(toolButtons).forEach(function(id){
+    var btn = document.getElementById(id);
+    if (btn) {
+      btn.addEventListener('click', function(){
+        logEvent('tool_used', { tool: toolButtons[id] });
+      });
+    }
+  });
+  document.querySelectorAll('button').forEach(function(btn){
+    if (btn.getAttribute('onclick') === 'runTimeline()') {
+      btn.addEventListener('click', function(){ logEvent('tool_used', { tool: 'timeline' }); });
+    }
+  });
+  var commissionLogged = false;
+  var salePriceEl = document.getElementById('salePrice');
+  if (salePriceEl) {
+    salePriceEl.addEventListener('input', function(){
+      if (!commissionLogged) { commissionLogged = true; logEvent('tool_used', { tool: 'commission' }); }
+    });
+  }
+
+  document.querySelectorAll('.mode-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      logEvent('mode_toggle', { newMode: btn.dataset.mode });
+    });
+  });
+
+  document.querySelectorAll('a[href*="buy.stripe.com"]').forEach(function(a){
+    a.addEventListener('click', function(){
+      logEvent('stripe_click', { href: a.href });
+    });
+  });
+</script>
 </body>
 </html>
  
