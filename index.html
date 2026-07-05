@@ -987,7 +987,7 @@ async function runMarketing() {
       'Price: ' + (price || 'not specified') + '\n\n' +
       'Generate exactly 4 sections. Use these EXACT section labels on their own line:\n\n' +
       '[SEO STRATEGY]\n' +
-      'Write 5 high-converting SEO keywords for this property on LoopNet/CoStar-style platforms, then write a 90-word SEO meta description that leads with the key investment metric or building spec.\n\n' +
+      'Write 5 high-converting SEO & GEO keywords for this property on LoopNet/CoStar-style platforms, then write a 90-word SEO & GEO meta description that leads with the key investment metric or building spec.\n\n' +
       '[MARKET POSITIONING PITCH]\n' +
       'Write a 100-word market positioning pitch for a broker opinion of value or offering memorandum. Why does this asset beat comparable properties right now?\n\n' +
       '[INVESTOR ROI ANGLE]\n' +
@@ -1002,7 +1002,7 @@ async function runMarketing() {
       'Listing Price: ' + (price || 'not specified') + '\n\n' +
       'Generate exactly 4 sections. Use these EXACT section labels on their own line:\n\n' +
       '[SEO STRATEGY]\n' +
-      'Write 5 high-converting SEO keywords for this property, then write a 90-word SEO meta description optimized for Zillow, Realtor.com, and Google.\n\n' +
+      'Write 5 high-converting SEO & GEO keywords for this property, then write a 90-word SEO & GEO meta description optimized for Zillow, Realtor.com, and Google.\n\n' +
       '[MARKET POSITIONING PITCH]\n' +
       'Write a 100-word market positioning pitch for listing presentations. Why does this home beat its competition right now?\n\n' +
       '[BUYER PROFIT ROI ANGLE]\n' +
@@ -1270,7 +1270,7 @@ async function runListing() {
       '[HEADLINE OPTIONS]\n' +
       'Write 5 compelling marketing headline options, numbered 1 through 5, for flyers and broker cold emails.\n\n' +
       '[SEO SCORE]\n' +
-      'Rate this listing description\'s SEO strength from 1 to 10 for commercial listing platforms. List the top 5 keywords naturally embedded. Explain specifically what would push the score higher.';
+      'Rate this listing description\'s SEO & GEO strength from 1 to 10 for commercial listing platforms. List the top 5 keywords naturally embedded. Explain specifically what would push the score higher.';
   } else {
     var bedBath  = document.getElementById('ldBedBath').value.trim() || 'not specified';
     var sqft     = document.getElementById('ldSqft').value.trim();
@@ -1295,7 +1295,7 @@ async function runListing() {
       '[HEADLINE OPTIONS]\n' +
       'Write 5 compelling marketing headline options, numbered 1 through 5. These are for flyers, ads, and social posts.\n\n' +
       '[SEO SCORE]\n' +
-      'Rate this listing description\'s SEO strength from 1 to 10. List the top 5 keywords naturally embedded in the description. Explain specifically what would push the score higher.';
+      'Rate this listing description\'s SEO & GEO strength from 1 to 10. List the top 5 keywords naturally embedded in the description. Explain specifically what would push the score higher.';
   }
 
   try {
