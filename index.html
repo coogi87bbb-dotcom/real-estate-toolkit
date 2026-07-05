@@ -157,6 +157,11 @@ footer span{color:var(--gold-dim);}
 .voice-wrap input[type=number]::-webkit-outer-spin-button,
 .voice-wrap input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .voice-wrap input[type=number]{-moz-appearance:textfield;}
+.mode-toggle-wrap{display:flex;justify-content:center;margin:0 0 22px;}
+.mode-toggle{display:inline-flex;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:4px;gap:4px;}
+.mode-btn{background:transparent;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;padding:9px 20px;border-radius:9px;cursor:pointer;transition:background .15s,color .15s;}
+.mode-btn.active{background:var(--gold);color:#0A0A0A;}
+.mode-btn:not(.active):hover{color:var(--gold-light);}
 </style>
 </head>
 <body>
@@ -168,15 +173,22 @@ footer span{color:var(--gold-dim);}
   <div class="divider"></div>
 </header>
 
+<div class="mode-toggle-wrap">
+  <div class="mode-toggle" id="modeToggle">
+    <button type="button" class="mode-btn active" data-mode="residential" onclick="setMode('residential')">🏡 Residential</button>
+    <button type="button" class="mode-btn" data-mode="commercial" onclick="setMode('commercial')">🏢 Commercial</button>
+  </div>
+</div>
+
 <div class="nav-wrap">
   <nav id="mainNav">
-    <button class="active" onclick="showPanel('commission',this)">💰 Commission</button>
-    <button onclick="showPanel('marketing',this)">📣 Marketing</button>
-    <button onclick="showPanel('offer',this)">🤝 Offer &amp; Counter</button>
-    <button onclick="showPanel('followup',this)">📧 Follow-Up</button>
-    <button onclick="showPanel('listing',this)">🏠 Listing Copy</button>
-    <button onclick="showPanel('openhouse',this)">🗝️ Open House</button>
-    <button onclick="showPanel('timeline',this)">📅 Deadlines</button>
+    <button class="active" id="navCommission" onclick="showPanel('commission',this)">💰 Commission</button>
+    <button id="navMarketing" onclick="showPanel('marketing',this)">📣 Marketing</button>
+    <button id="navOffer" onclick="showPanel('offer',this)">🤝 Offer &amp; Counter</button>
+    <button id="navFollowup" onclick="showPanel('followup',this)">📧 Follow-Up</button>
+    <button id="navListing" onclick="showPanel('listing',this)">🏠 Listing Copy</button>
+    <button id="navOpenhouse" onclick="showPanel('openhouse',this)">🗝️ Open House</button>
+    <button id="navTimeline" onclick="showPanel('timeline',this)">📅 Deadlines</button>
   </nav>
 </div>
 
@@ -212,11 +224,43 @@ footer span{color:var(--gold-dim);}
   <label class="fl">Transaction Fees &amp; Other Costs ($)</label>
   <input type="number" id="fees" placeholder="e.g. 350" min="0" oninput="calcCommission()"/>
 
+  <div class="cre-only">
+    <label class="fl">Property Type (Commercial)</label>
+    <select id="commPropType">
+      <option value="Office">Office</option>
+      <option value="Retail">Retail</option>
+      <option value="Industrial">Industrial</option>
+      <option value="Multifamily">Multifamily</option>
+      <option value="Mixed-Use">Mixed-Use</option>
+      <option value="Land">Land</option>
+    </select>
+
+    <label class="fl">Net Operating Income — Annual ($)</label>
+    <input type="number" id="noi" placeholder="e.g. 145000" min="0" oninput="calcCommission()"/>
+
+    <div class="row2">
+      <div>
+        <label class="fl">Down Payment ($)</label>
+        <input type="number" id="downPayment" placeholder="e.g. 500000" min="0" oninput="calcCommission()"/>
+      </div>
+      <div>
+        <label class="fl">Annual Debt Service ($)</label>
+        <input type="number" id="debtService" placeholder="e.g. 90000" min="0" oninput="calcCommission()"/>
+      </div>
+    </div>
+
+    <label class="fl">Building Square Footage</label>
+    <input type="number" id="commSqft" placeholder="e.g. 12000" min="0" oninput="calcCommission()"/>
+  </div>
+
   <div class="stat-grid">
     <div class="stat-box"><div class="stat-lbl">Gross Commission</div><div class="stat-val big" id="grossComm">$0</div></div>
     <div class="stat-box"><div class="stat-lbl">Your Side Gross</div><div class="stat-val" id="yourSideGross">$0</div></div>
     <div class="stat-box"><div class="stat-lbl">After Broker Split</div><div class="stat-val" id="afterBroker">$0</div></div>
     <div class="stat-box"><div class="stat-lbl">Your Net Take-Home</div><div class="stat-val green" id="netTakeHome">$0</div></div>
+    <div class="stat-box cre-only"><div class="stat-lbl">Cap Rate</div><div class="stat-val" id="capRate">0%</div></div>
+    <div class="stat-box cre-only"><div class="stat-lbl">Cash-on-Cash Return</div><div class="stat-val" id="cashOnCash">0%</div></div>
+    <div class="stat-box cre-only"><div class="stat-lbl">Price / SF</div><div class="stat-val" id="pricePerSF">$0</div></div>
   </div>
 </div>
 </div>
@@ -235,7 +279,7 @@ footer span{color:var(--gold-dim);}
   <label class="fl">Target Market / Neighborhood</label>
   <input type="text" id="mktNeighborhood" placeholder="e.g. Buckhead Atlanta, first-time buyers, luxury investors..."/>
 
-  <label class="fl">Listing Price</label>
+  <label class="fl" id="mktPriceLabel">Listing Price</label>
   <input type="text" id="mktPrice" placeholder="e.g. $525,000"/>
 
   <button class="btn btn-gold" id="mktBtn" onclick="runMarketing()">⚡ Generate Full Strategy Package</button>
@@ -258,14 +302,44 @@ footer span{color:var(--gold-dim);}
     <option value="seller">The Seller</option>
   </select>
 
+  <div class="cre-only">
+    <label class="fl">Deal Type</label>
+    <select id="offerDealType">
+      <option value="purchase">Purchase</option>
+      <option value="lease">Lease</option>
+    </select>
+  </div>
+
   <div class="row2">
     <div>
-      <label class="fl">Asking / List Price ($)</label>
+      <label class="fl" id="offerAskLabel">Asking / List Price ($)</label>
       <input type="number" id="offerAsk" placeholder="e.g. 499000" min="0"/>
     </div>
     <div>
-      <label class="fl">Offer / Counter Price ($)</label>
+      <label class="fl" id="offerPriceLabel">Offer / Counter Price ($)</label>
       <input type="number" id="offerPrice" placeholder="e.g. 472000" min="0"/>
+    </div>
+  </div>
+
+  <div class="row2 cre-only">
+    <div>
+      <label class="fl">Base Rent ($/SF/Yr) — if lease</label>
+      <input type="text" id="offerBaseRent" placeholder="e.g. $22.00/SF/yr"/>
+    </div>
+    <div>
+      <label class="fl">Lease Term (Years) — if lease</label>
+      <input type="number" id="offerLeaseTerm" placeholder="e.g. 5" min="0"/>
+    </div>
+  </div>
+
+  <div class="row2 cre-only">
+    <div>
+      <label class="fl">CAM Charges ($/SF/Yr) — if lease</label>
+      <input type="text" id="offerCAM" placeholder="e.g. $4.50/SF/yr"/>
+    </div>
+    <div>
+      <label class="fl">TI Allowance ($/SF) — if lease</label>
+      <input type="text" id="offerTI" placeholder="e.g. $15/SF"/>
     </div>
   </div>
 
@@ -275,11 +349,22 @@ footer span{color:var(--gold-dim);}
   <label class="fl">Days on Market</label>
   <input type="number" id="offerDOM" placeholder="e.g. 47" min="0"/>
 
-  <label class="fl">Contingencies</label>
-  <div class="row3" style="margin-top:8px;">
-    <label class="ck-label"><input type="checkbox" id="contInspect" checked/> Inspection</label>
-    <label class="ck-label"><input type="checkbox" id="contFinance" checked/> Financing</label>
-    <label class="ck-label"><input type="checkbox" id="contAppraisal" checked/> Appraisal</label>
+  <div class="res-only">
+    <label class="fl">Contingencies</label>
+    <div class="row3" style="margin-top:8px;">
+      <label class="ck-label"><input type="checkbox" id="contInspect" checked/> Inspection</label>
+      <label class="ck-label"><input type="checkbox" id="contFinance" checked/> Financing</label>
+      <label class="ck-label"><input type="checkbox" id="contAppraisal" checked/> Appraisal</label>
+    </div>
+  </div>
+
+  <div class="cre-only">
+    <label class="fl">Contingencies</label>
+    <div class="row3" style="margin-top:8px;">
+      <label class="ck-label"><input type="checkbox" id="contDueDiligence" checked/> Due Diligence</label>
+      <label class="ck-label"><input type="checkbox" id="contFinanceCRE" checked/> Financing</label>
+      <label class="ck-label"><input type="checkbox" id="contEnviro" checked/> Environmental / Zoning</label>
+    </div>
   </div>
 
   <label class="fl">Seller Motivation Level</label>
@@ -311,17 +396,31 @@ footer span{color:var(--gold-dim);}
   <div class="card-title">📧 Client Follow-Up Email Sequence <span class="badge-new">NEW</span></div>
   <div class="card-desc">Stop losing deals to silence. Get a personalized 5-email drip sequence for any lead type — ready for your CRM in 60 seconds.</div>
 
-  <label class="fl">Lead Type</label>
-  <select id="fuLeadType">
-    <option value="first_time_buyer">First-Time Buyer</option>
-    <option value="move_up_buyer">Move-Up Buyer (selling + buying)</option>
-    <option value="investor">Real Estate Investor</option>
-    <option value="relocating">Corporate Relocation</option>
-    <option value="downsizer">Empty Nester / Downsizer</option>
-    <option value="seller_lead">Potential Seller Lead</option>
-    <option value="open_house_visitor">Open House Visitor</option>
-    <option value="cold_lead">Cold Lead (30+ days no contact)</option>
-  </select>
+  <div class="res-only">
+    <label class="fl">Lead Type</label>
+    <select id="fuLeadType">
+      <option value="first_time_buyer">First-Time Buyer</option>
+      <option value="move_up_buyer">Move-Up Buyer (selling + buying)</option>
+      <option value="investor">Real Estate Investor</option>
+      <option value="relocating">Corporate Relocation</option>
+      <option value="downsizer">Empty Nester / Downsizer</option>
+      <option value="seller_lead">Potential Seller Lead</option>
+      <option value="open_house_visitor">Open House Visitor</option>
+      <option value="cold_lead">Cold Lead (30+ days no contact)</option>
+    </select>
+  </div>
+
+  <div class="cre-only">
+    <label class="fl">Lead Type</label>
+    <select id="fuLeadTypeCRE">
+      <option value="investor_cap_rate_buyer">Investor / Cap Rate Buyer</option>
+      <option value="developer">Developer</option>
+      <option value="business_owner_tenant">Business Owner / Tenant</option>
+      <option value="exchange_1031_buyer">1031 Exchange Buyer</option>
+      <option value="institutional_buyer">Institutional Buyer</option>
+      <option value="cold_lead">Cold Lead (30+ days no contact)</option>
+    </select>
+  </div>
 
   <label class="fl">Client Name(s)</label>
   <input type="text" id="fuName" placeholder="e.g. Marcus &amp; Tanya"/>
@@ -364,7 +463,7 @@ footer span{color:var(--gold-dim);}
   <div class="card-title">🏠 Listing Description Generator <span class="badge-new">NEW</span></div>
   <div class="card-desc">MLS-optimized listing copy with SEO and GEO scoring. Turn 60 seconds of input into a description that stops scrollers and pulls the right buyer in.</div>
 
-  <div class="row2">
+  <div class="row2 res-only">
     <div>
       <label class="fl">Beds / Baths</label>
       <input type="text" id="ldBedBath" placeholder="e.g. 4BD / 3.5BA"/>
@@ -375,34 +474,92 @@ footer span{color:var(--gold-dim);}
     </div>
   </div>
 
-  <label class="fl">Property Type</label>
-  <select id="ldType">
-    <option value="Single Family Home">Single Family Home</option>
-    <option value="Condo / Townhome">Condo / Townhome</option>
-    <option value="Luxury Estate">Luxury Estate</option>
-    <option value="Investment / Multi-family">Investment / Multi-family</option>
-    <option value="Land / Lot">Land / Lot</option>
-    <option value="Commercial Property">Commercial Property</option>
-  </select>
+  <div class="row2 cre-only">
+    <div>
+      <label class="fl">Building Class</label>
+      <select id="ldBuildingClass">
+        <option value="Class A">Class A</option>
+        <option value="Class B">Class B</option>
+        <option value="Class C">Class C</option>
+      </select>
+    </div>
+    <div>
+      <label class="fl">Total / Leasable Sq Ft</label>
+      <input type="number" id="ldSqftCRE" placeholder="e.g. 18000" min="0"/>
+    </div>
+  </div>
 
-  <label class="fl">Top Features &amp; Upgrades (list everything)</label>
+  <div class="res-only">
+    <label class="fl">Property Type</label>
+    <select id="ldType">
+      <option value="Single Family Home">Single Family Home</option>
+      <option value="Condo / Townhome">Condo / Townhome</option>
+      <option value="Luxury Estate">Luxury Estate</option>
+      <option value="Investment / Multi-family">Investment / Multi-family</option>
+      <option value="Land / Lot">Land / Lot</option>
+      <option value="Commercial Property">Commercial Property</option>
+    </select>
+  </div>
+
+  <div class="cre-only">
+    <label class="fl">Property Type</label>
+    <select id="ldTypeCRE">
+      <option value="Office">Office</option>
+      <option value="Retail">Retail</option>
+      <option value="Industrial">Industrial</option>
+      <option value="Warehouse">Warehouse</option>
+      <option value="Multifamily">Multifamily</option>
+      <option value="Mixed-Use">Mixed-Use</option>
+      <option value="Land">Land</option>
+    </select>
+  </div>
+
+  <label class="fl" id="ldFeaturesLabel">Top Features &amp; Upgrades (list everything)</label>
   <textarea id="ldFeatures" placeholder="e.g. Renovated chef's kitchen, quartz counters, SS appliances, primary suite with spa bath, 3-car garage, resort-style pool, smart home, corner lot, new HVAC 2023, hardwood floors throughout..."></textarea>
 
-  <label class="fl">Neighborhood &amp; Location Selling Points</label>
+  <label class="fl" id="ldLocationLabel">Neighborhood &amp; Location Selling Points</label>
   <input type="text" id="ldLocation" placeholder="e.g. Top-rated schools, walk to downtown, 5 min from I-285, gated community..."/>
 
-  <label class="fl">Target Buyer</label>
-  <select id="ldBuyer">
-    <option value="Growing Families">Growing Families</option>
-    <option value="Young Professionals">Young Professionals</option>
-    <option value="Luxury Buyers">Luxury Buyers</option>
-    <option value="Investors">Investors / ROI Focus</option>
-    <option value="Retirees and Downsizers">Retirees / Downsizers</option>
-    <option value="First-Time Buyers">First-Time Buyers</option>
-  </select>
+  <div class="res-only">
+    <label class="fl">Target Buyer</label>
+    <select id="ldBuyer">
+      <option value="Growing Families">Growing Families</option>
+      <option value="Young Professionals">Young Professionals</option>
+      <option value="Luxury Buyers">Luxury Buyers</option>
+      <option value="Investors">Investors / ROI Focus</option>
+      <option value="Retirees and Downsizers">Retirees / Downsizers</option>
+      <option value="First-Time Buyers">First-Time Buyers</option>
+    </select>
+  </div>
+
+  <div class="cre-only">
+    <label class="fl">Target Buyer</label>
+    <select id="ldBuyerCRE">
+      <option value="Owner-User">Owner-User</option>
+      <option value="Investor / Cap Rate Buyer">Investor / Cap Rate Buyer</option>
+      <option value="Developer">Developer</option>
+      <option value="1031 Exchange Buyer">1031 Exchange Buyer</option>
+      <option value="Institutional / REIT">Institutional / REIT</option>
+    </select>
+  </div>
 
   <label class="fl">Listing Price</label>
   <input type="text" id="ldPrice" placeholder="e.g. $649,000"/>
+
+  <div class="row2 cre-only">
+    <div>
+      <label class="fl">Lease Rate ($/SF/Year) — optional</label>
+      <input type="text" id="ldLeaseRate" placeholder="e.g. $24.50/SF/yr"/>
+    </div>
+    <div>
+      <label class="fl">Lease Type</label>
+      <select id="ldLeaseType">
+        <option value="NNN">NNN (Triple Net)</option>
+        <option value="Gross">Gross</option>
+        <option value="Modified Gross">Modified Gross</option>
+      </select>
+    </div>
+  </div>
 
   <button class="btn btn-gold" id="ldBtn" onclick="runListing()">✍️ Generate MLS Listing + SEO & GEO Score</button>
   <div class="lbox" id="ldLoading"><div class="spinner"></div><p>Crafting your listing masterpiece...</p></div>
@@ -415,18 +572,18 @@ footer span{color:var(--gold-dim);}
 ══════════════════════════════════════════ -->
 <div id="panel-openhouse" class="panel">
 <div class="card">
-  <div class="card-title">🗝️ Open House ROI &amp; Script Builder <span class="badge-new">NEW</span></div>
-  <div class="card-desc">Stop winging it. Get a budget breakdown, word-for-word agent script, lead qualification questions, and post-visit follow-up emails — before you arrive at the door.</div>
+  <div class="card-title" id="ohCardTitle">🗝️ Open House ROI &amp; Script Builder <span class="badge-new">NEW</span></div>
+  <div class="card-desc" id="ohCardDesc">Stop winging it. Get a budget breakdown, word-for-word agent script, lead qualification questions, and post-visit follow-up emails — before you arrive at the door.</div>
 
-  <label class="fl">Property Address &amp; Type</label>
+  <label class="fl" id="ohAddrLabel">Property Address &amp; Type</label>
   <input type="text" id="ohAddr" placeholder="e.g. 318 Oak Blvd — 4BR colonial, $549K, Roswell GA"/>
 
-  <label class="fl">Top 5 Property Highlights</label>
+  <label class="fl" id="ohHighlightsLabel">Top 5 Property Highlights</label>
   <textarea id="ohHighlights" style="min-height:72px" placeholder="e.g. Just renovated, new roof, best school district in county, huge backyard, priced $30K below comps..."></textarea>
 
   <div class="row2">
     <div>
-      <label class="fl">Open House Budget ($)</label>
+      <label class="fl" id="ohBudgetLabel">Open House Budget ($)</label>
       <input type="number" id="ohBudget" placeholder="e.g. 500" min="0"/>
     </div>
     <div>
@@ -435,13 +592,25 @@ footer span{color:var(--gold-dim);}
     </div>
   </div>
 
-  <label class="fl">Expected Visitor Mix</label>
-  <select id="ohVisitor">
-    <option value="mixed families investors and curious neighbors">Mixed — Families, Investors &amp; Neighbors</option>
-    <option value="luxury buyers">Luxury Buyers Only</option>
-    <option value="first-time buyers">Mostly First-Time Buyers</option>
-    <option value="investment-focused buyers">Investment-Focused Buyers</option>
-  </select>
+  <div class="res-only">
+    <label class="fl">Expected Visitor Mix</label>
+    <select id="ohVisitor">
+      <option value="mixed families investors and curious neighbors">Mixed — Families, Investors &amp; Neighbors</option>
+      <option value="luxury buyers">Luxury Buyers Only</option>
+      <option value="first-time buyers">Mostly First-Time Buyers</option>
+      <option value="investment-focused buyers">Investment-Focused Buyers</option>
+    </select>
+  </div>
+
+  <div class="cre-only">
+    <label class="fl">Expected Attendee Type</label>
+    <select id="ohVisitorCRE">
+      <option value="institutional investors">Institutional Investors</option>
+      <option value="private equity buyers">Private Equity Buyers</option>
+      <option value="owner-user or tenant prospects">Owner-User / Tenant Prospects</option>
+      <option value="developers and brokers on a broker preview tour">Developers &amp; Brokers (Broker Preview)</option>
+    </select>
+  </div>
 
   <button class="btn btn-gold" id="ohBtn" onclick="runOpenHouse()">🏡 Generate Open House Playbook</button>
   <div class="lbox" id="ohLoading"><div class="spinner"></div><p>Building your open house playbook...</p></div>
@@ -468,22 +637,49 @@ footer span{color:var(--gold-dim);}
     </div>
   </div>
 
-  <label class="fl">Loan / Transaction Type</label>
-  <select id="tlType">
-    <option value="conventional">Conventional Loan</option>
-    <option value="fha">FHA Loan</option>
-    <option value="va">VA Loan</option>
-    <option value="cash">Cash Purchase</option>
-    <option value="jumbo">Jumbo / Non-Conforming</option>
-  </select>
+  <div class="res-only">
+    <label class="fl">Loan / Transaction Type</label>
+    <select id="tlType">
+      <option value="conventional">Conventional Loan</option>
+      <option value="fha">FHA Loan</option>
+      <option value="va">VA Loan</option>
+      <option value="cash">Cash Purchase</option>
+      <option value="jumbo">Jumbo / Non-Conforming</option>
+    </select>
+  </div>
+
+  <div class="cre-only">
+    <label class="fl">Loan / Transaction Type</label>
+    <select id="tlTypeCRE">
+      <option value="conventional_cre">Conventional CRE Loan</option>
+      <option value="sba_504">SBA 504</option>
+      <option value="sba_7a">SBA 7(a)</option>
+      <option value="bridge">Bridge Loan</option>
+      <option value="cmbs">CMBS Loan</option>
+      <option value="cash">All Cash</option>
+    </select>
+  </div>
 
   <label class="fl">State (affects timelines)</label>
   <input type="text" id="tlState" placeholder="e.g. Georgia, Texas, Florida..."/>
 
-  <label class="fl" style="margin-bottom:10px;">Special Conditions</label>
-  <div class="row2">
-    <label class="ck-label"><input type="checkbox" id="tlHOA"/> HOA Approval Required</label>
-    <label class="ck-label"><input type="checkbox" id="tlSeptic"/> Septic Inspection Needed</label>
+  <div class="res-only">
+    <label class="fl" style="margin-bottom:10px;">Special Conditions</label>
+    <div class="row2">
+      <label class="ck-label"><input type="checkbox" id="tlHOA"/> HOA Approval Required</label>
+      <label class="ck-label"><input type="checkbox" id="tlSeptic"/> Septic Inspection Needed</label>
+    </div>
+  </div>
+
+  <div class="cre-only">
+    <label class="fl" style="margin-bottom:10px;">Special Conditions</label>
+    <div class="row2">
+      <label class="ck-label"><input type="checkbox" id="tlEnviro" checked/> Phase I Environmental Review</label>
+      <label class="ck-label"><input type="checkbox" id="tlZoning"/> Zoning / Entitlement Approval</label>
+    </div>
+    <div class="row2" style="margin-top:10px;">
+      <label class="ck-label"><input type="checkbox" id="tlEstoppel" checked/> Tenant Estoppel Certificates</label>
+    </div>
   </div>
 
   <button class="btn btn-gold" onclick="runTimeline()">📋 Generate Full Deadline Timeline</button>
@@ -639,6 +835,98 @@ function extractSection(text, label) {
 }
 
 /* ═══════════════════════════════════════════════════════
+   RESIDENTIAL / COMMERCIAL MODE TOGGLE (added)
+═══════════════════════════════════════════════════════ */
+function setMode(mode) {
+  document.body.classList.toggle('mode-commercial', mode === 'commercial');
+
+  document.querySelectorAll('.mode-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+
+  var navLabels = mode === 'commercial'
+    ? {
+        navCommission: '💰 Commission &amp; Cap Rate',
+        navMarketing:  '📣 Investor Marketing',
+        navOffer:      '🤝 Offer &amp; Lease Terms',
+        navFollowup:   '📧 Investor Follow-Up',
+        navListing:    '🏢 Listing Copy',
+        navOpenhouse:  '🏢 Property Tour',
+        navTimeline:   '📅 CRE Deadlines'
+      }
+    : {
+        navCommission: '💰 Commission',
+        navMarketing:  '📣 Marketing',
+        navOffer:      '🤝 Offer &amp; Counter',
+        navFollowup:   '📧 Follow-Up',
+        navListing:    '🏠 Listing Copy',
+        navOpenhouse:  '🗝️ Open House',
+        navTimeline:   '📅 Deadlines'
+      };
+  Object.keys(navLabels).forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = navLabels[id];
+  });
+
+  document.querySelectorAll('.cre-only').forEach(function(el){
+    el.style.display = (mode === 'commercial') ? '' : 'none';
+  });
+  document.querySelectorAll('.res-only').forEach(function(el){
+    el.style.display = (mode === 'commercial') ? 'none' : '';
+  });
+
+  var featLabel = document.getElementById('ldFeaturesLabel');
+  var featEl    = document.getElementById('ldFeatures');
+  var locLabel  = document.getElementById('ldLocationLabel');
+  var locEl     = document.getElementById('ldLocation');
+  if (featLabel && featEl && locLabel && locEl) {
+    if (mode === 'commercial') {
+      featLabel.textContent = 'Building Specs (zoning, ceiling height, loading docks, parking ratio, HVAC, sprinkler...)';
+      featEl.placeholder = 'e.g. Zoned C-2, 24ft clear height, 4 dock-high doors + 1 drive-in, 3.5/1000 parking ratio, wet sprinkler system, 3-phase power, 2 HVAC units (2019)...';
+      locLabel.textContent = 'Trade Area & Access';
+      locEl.placeholder = 'e.g. 28,000 VPD on Main St, 5 min to I-85 interchange, dense retail corridor, near major distribution hub...';
+    } else {
+      featLabel.textContent = 'Top Features & Upgrades (list everything)';
+      featEl.placeholder = "e.g. Renovated chef's kitchen, quartz counters, SS appliances, primary suite with spa bath, 3-car garage, resort-style pool, smart home, corner lot, new HVAC 2023, hardwood floors throughout...";
+      locLabel.textContent = 'Neighborhood & Location Selling Points';
+      locEl.placeholder = 'e.g. Top-rated schools, walk to downtown, 5 min from I-285, gated community...';
+    }
+  }
+
+  var ohTitle = document.getElementById('ohCardTitle');
+  var ohDesc  = document.getElementById('ohCardDesc');
+  var ohAddrLbl = document.getElementById('ohAddrLabel');
+  var ohHighLbl = document.getElementById('ohHighlightsLabel');
+  var ohBudgetLbl = document.getElementById('ohBudgetLabel');
+  if (ohTitle && ohDesc) {
+    if (mode === 'commercial') {
+      ohTitle.innerHTML = '🏢 Property Tour &amp; Broker Preview Builder <span class="badge-new">NEW</span>';
+      ohDesc.textContent = 'Stop winging it. Get a budget breakdown, word-for-word tour script, investor qualification questions, and post-tour follow-up emails — before the broker preview.';
+      if (ohAddrLbl) ohAddrLbl.textContent = 'Property Address & Type';
+      if (ohHighLbl) ohHighLbl.textContent = 'Top 5 Investment Highlights';
+      if (ohBudgetLbl) ohBudgetLbl.textContent = 'Tour / Preview Budget ($)';
+    } else {
+      ohTitle.innerHTML = '🗝️ Open House ROI &amp; Script Builder <span class="badge-new">NEW</span>';
+      ohDesc.textContent = 'Stop winging it. Get a budget breakdown, word-for-word agent script, lead qualification questions, and post-visit follow-up emails — before you arrive at the door.';
+      if (ohAddrLbl) ohAddrLbl.textContent = 'Property Address & Type';
+      if (ohHighLbl) ohHighLbl.textContent = 'Top 5 Property Highlights';
+      if (ohBudgetLbl) ohBudgetLbl.textContent = 'Open House Budget ($)';
+    }
+  }
+
+  if (typeof calcCommission === 'function') calcCommission();
+
+  try { localStorage.setItem('creMode', mode); } catch(e){}
+}
+
+(function(){
+  var saved = 'residential';
+  try { saved = localStorage.getItem('creMode') || 'residential'; } catch(e){}
+  document.addEventListener('DOMContentLoaded', function(){ setMode(saved); });
+  if (document.readyState === 'complete' || document.readyState === 'interactive') setMode(saved);
+})();
+
+/* ═══════════════════════════════════════════════════════
    TOOL 1 — COMMISSION CALCULATOR (real-time, no API)
 ═══════════════════════════════════════════════════════ */
 function calcCommission() {
@@ -656,12 +944,30 @@ function calcCommission() {
   document.getElementById('yourSideGross').textContent = fmt(yourGross);
   document.getElementById('afterBroker').textContent   = fmt(afterBkr);
   document.getElementById('netTakeHome').textContent   = fmt(net);
+
+  var noiEl = document.getElementById('noi');
+  var noi = noiEl ? (parseFloat(noiEl.value) || 0) : 0;
+  var capRateEl = document.getElementById('capRate');
+  if (capRateEl) capRateEl.textContent = (price > 0 ? (noi / price * 100) : 0).toFixed(2) + '%';
+
+  var down = parseFloat((document.getElementById('downPayment')||{}).value) || 0;
+  var debt = parseFloat((document.getElementById('debtService')||{}).value) || 0;
+  var cocEl = document.getElementById('cashOnCash');
+  if (cocEl) {
+    var annualCashFlow = noi - debt;
+    cocEl.textContent = (down > 0 ? (annualCashFlow / down * 100) : 0).toFixed(2) + '%';
+  }
+
+  var sqft = parseFloat((document.getElementById('commSqft')||{}).value) || 0;
+  var psfEl = document.getElementById('pricePerSF');
+  if (psfEl) psfEl.textContent = fmt(sqft > 0 ? (price / sqft) : 0);
 }
 
 /* ═══════════════════════════════════════════════════════
    TOOL 2 — AI MARKETING ENGINE
 ═══════════════════════════════════════════════════════ */
 async function runMarketing() {
+  var mode = document.body.classList.contains('mode-commercial') ? 'commercial' : 'residential';
   var specs = document.getElementById('mktSpecs').value.trim();
   var nbhd  = document.getElementById('mktNeighborhood').value.trim();
   var price = document.getElementById('mktPrice').value.trim();
@@ -671,32 +977,51 @@ async function runMarketing() {
   showLoading('mktLoading');
   clearEl('mktResults');
 
-  var system = 'You are a highly gifted real estate marketing genius with 40 years of experience and over $2 billion in sales. You have mastered SEO and GEO social media, luxury positioning, and buyer psychology. Respond in plain text only. Do not use markdown, asterisks, pound signs, or bullet hyphens.';
+  var system, prompt;
 
-  var prompt = 'Property: ' + specs + '\n' +
-    'Neighborhood/Target Market: ' + (nbhd || 'not specified') + '\n' +
-    'Listing Price: ' + (price || 'not specified') + '\n\n' +
-    'Generate exactly 4 sections. Use these EXACT section labels on their own line:\n\n' +
-    '[SEO STRATEGY]\n' +
-    'Write 5 high-converting SEO keywords for this property, then write a 90-word SEO meta description optimized for Zillow, Realtor.com, and Google.\n\n' +
-    '[MARKET POSITIONING PITCH]\n' +
-    'Write a 100-word market positioning pitch for listing presentations. Why does this home beat its competition right now?\n\n' +
-    '[BUYER PROFIT ROI ANGLE]\n' +
-    'Write a 100-word buyer-facing ROI pitch. Include equity potential, rental comp value, and appreciation angle.\n\n' +
-    '[TIKTOK REEL SCRIPT]\n' +
-    'Write a complete 30-second TikTok/Instagram Reel script with a strong hook, compelling middle, and call to action. Include relevant emojis. Make it viral-worthy.';
+  if (mode === 'commercial') {
+    system = 'You are a highly gifted commercial real estate marketing genius with 40 years of experience and over $2 billion in CRE transactions. You have mastered investor marketing, broker network distribution, and positioning deals for cap-rate buyers, developers, and institutional capital. Respond in plain text only. Do not use markdown, asterisks, pound signs, or bullet hyphens.';
+
+    prompt = 'Property: ' + specs + '\n' +
+      'Trade Area / Target Market: ' + (nbhd || 'not specified') + '\n' +
+      'Price: ' + (price || 'not specified') + '\n\n' +
+      'Generate exactly 4 sections. Use these EXACT section labels on their own line:\n\n' +
+      '[SEO STRATEGY]\n' +
+      'Write 5 high-converting SEO keywords for this property on LoopNet/CoStar-style platforms, then write a 90-word SEO meta description that leads with the key investment metric or building spec.\n\n' +
+      '[MARKET POSITIONING PITCH]\n' +
+      'Write a 100-word market positioning pitch for a broker opinion of value or offering memorandum. Why does this asset beat comparable properties right now?\n\n' +
+      '[INVESTOR ROI ANGLE]\n' +
+      'Write a 100-word investor-facing pitch. Include cap rate potential, NOI growth angle, and value-add or stabilization opportunity.\n\n' +
+      '[BROKER NETWORK OUTREACH SCRIPT]\n' +
+      'Write a complete script for reaching out to a broker network and investor database about this listing — for email or a short video. Strong hook with the key number, compelling middle, clear call to action to request the OM or schedule a tour.';
+  } else {
+    system = 'You are a highly gifted real estate marketing genius with 40 years of experience and over $2 billion in sales. You have mastered SEO and GEO social media, luxury positioning, and buyer psychology. Respond in plain text only. Do not use markdown, asterisks, pound signs, or bullet hyphens.';
+
+    prompt = 'Property: ' + specs + '\n' +
+      'Neighborhood/Target Market: ' + (nbhd || 'not specified') + '\n' +
+      'Listing Price: ' + (price || 'not specified') + '\n\n' +
+      'Generate exactly 4 sections. Use these EXACT section labels on their own line:\n\n' +
+      '[SEO STRATEGY]\n' +
+      'Write 5 high-converting SEO keywords for this property, then write a 90-word SEO meta description optimized for Zillow, Realtor.com, and Google.\n\n' +
+      '[MARKET POSITIONING PITCH]\n' +
+      'Write a 100-word market positioning pitch for listing presentations. Why does this home beat its competition right now?\n\n' +
+      '[BUYER PROFIT ROI ANGLE]\n' +
+      'Write a 100-word buyer-facing ROI pitch. Include equity potential, rental comp value, and appreciation angle.\n\n' +
+      '[TIKTOK REEL SCRIPT]\n' +
+      'Write a complete 30-second TikTok/Instagram Reel script with a strong hook, compelling middle, and call to action. Include relevant emojis. Make it viral-worthy.';
+  }
 
   try {
     var raw = await callClaude(system, prompt, 1800);
-    var s1 = extractSection(raw, 'SEO STRATEGY');
-    var s2 = extractSection(raw, 'MARKET POSITIONING PITCH');
-    var s3 = extractSection(raw, 'BUYER PROFIT ROI ANGLE');
-    var s4 = extractSection(raw, 'TIKTOK REEL SCRIPT');
+    var s1 = extractSection(raw, mode === 'commercial' ? 'SEO STRATEGY' : 'SEO STRATEGY');
+    var s2 = extractSection(raw, mode === 'commercial' ? 'MARKET POSITIONING PITCH' : 'MARKET POSITIONING PITCH');
+    var s3 = extractSection(raw, mode === 'commercial' ? 'INVESTOR ROI ANGLE' : 'BUYER PROFIT ROI ANGLE');
+    var s4 = extractSection(raw, mode === 'commercial' ? 'BROKER NETWORK OUTREACH SCRIPT' : 'TIKTOK REEL SCRIPT');
     document.getElementById('mktResults').innerHTML =
       makeSection('📊 SEO Strategy', s1 || raw) +
       makeSection('🏆 Market Positioning Pitch', s2) +
-      makeSection('💰 Buyer ROI & Profit Angle', s3) +
-      makeSection('📹 TikTok / Reel Script', s4);
+      makeSection(mode === 'commercial' ? '💰 Investor ROI Angle' : '💰 Buyer ROI & Profit Angle', s3) +
+      makeSection(mode === 'commercial' ? '📹 Broker Network Outreach Script' : '📹 TikTok / Reel Script', s4);
   } catch(e) {
     showError('mktResults', e.message);
   }
@@ -709,6 +1034,7 @@ async function runMarketing() {
    TOOL 3 — OFFER & COUNTER-OFFER GENERATOR
 ═══════════════════════════════════════════════════════ */
 async function runOffer() {
+  var mode = document.body.classList.contains('mode-commercial') ? 'commercial' : 'residential';
   var askRaw = document.getElementById('offerAsk').value.trim();
   var offRaw = document.getElementById('offerPrice').value.trim();
   if (!askRaw || !offRaw) { alert('Please enter both the asking price and the offer/counter price.'); return; }
@@ -722,11 +1048,35 @@ async function runOffer() {
   var close = document.getElementById('offerClose').value.trim() || 'standard timeline';
   var terms = document.getElementById('offerTerms').value.trim() || 'none';
 
-  var conts = [];
-  if (document.getElementById('contInspect').checked)   conts.push('Inspection');
-  if (document.getElementById('contFinance').checked)   conts.push('Financing');
-  if (document.getElementById('contAppraisal').checked) conts.push('Appraisal');
-  var contingencyStr = conts.length ? conts.join(', ') : 'No contingencies';
+  var contingencyStr, dealDetails = '';
+
+  if (mode === 'commercial') {
+    var conts = [];
+    if (document.getElementById('contDueDiligence').checked) conts.push('Due Diligence');
+    if (document.getElementById('contFinanceCRE').checked)   conts.push('Financing');
+    if (document.getElementById('contEnviro').checked)       conts.push('Environmental / Zoning');
+    contingencyStr = conts.length ? conts.join(', ') : 'No contingencies';
+
+    var dealType  = document.getElementById('offerDealType').value;
+    var baseRent  = document.getElementById('offerBaseRent').value.trim();
+    var leaseTerm = document.getElementById('offerLeaseTerm').value.trim();
+    var cam       = document.getElementById('offerCAM').value.trim();
+    var ti        = document.getElementById('offerTI').value.trim();
+
+    dealDetails = 'Deal Type: ' + dealType + '\n';
+    if (dealType === 'lease') {
+      dealDetails += (baseRent  ? 'Base Rent: ' + baseRent + '\n' : '') +
+                     (leaseTerm ? 'Lease Term: ' + leaseTerm + ' years\n' : '') +
+                     (cam       ? 'CAM Charges: ' + cam + '\n' : '') +
+                     (ti        ? 'TI Allowance: ' + ti + '\n' : '');
+    }
+  } else {
+    var conts = [];
+    if (document.getElementById('contInspect').checked)   conts.push('Inspection');
+    if (document.getElementById('contFinance').checked)   conts.push('Financing');
+    if (document.getElementById('contAppraisal').checked) conts.push('Appraisal');
+    contingencyStr = conts.length ? conts.join(', ') : 'No contingencies';
+  }
 
   var diffPct = ask > 0 ? Math.abs(((ask - ofr) / ask) * 100).toFixed(1) : '0';
   var diffDir = ofr < ask ? 'below asking' : (ofr > ask ? 'above asking' : 'at asking');
@@ -735,15 +1085,18 @@ async function runOffer() {
   showLoading('offerLoading');
   clearEl('offerResults');
 
-  var system = 'You are a highly gifted master genius real estate negotiator with 40 years of experience and over 3,000 closed transactions. You know every psychological and tactical lever in a real estate deal. You have coached hundreds of agents on negotiation. Respond in plain text only. No markdown, no asterisks, no pound signs.';
+  var system = mode === 'commercial'
+    ? 'You are a highly gifted master genius commercial real estate negotiator with 40 years of experience and over 3,000 closed CRE transactions across office, retail, industrial, and multifamily. You understand cap rate negotiation, lease economics, and how institutional and private capital think about deal terms. Respond in plain text only. No markdown, no asterisks, no pound signs.'
+    : 'You are a highly gifted master genius real estate negotiator with 40 years of experience and over 3,000 closed transactions. You know every psychological and tactical lever in a real estate deal. You have coached hundreds of agents on negotiation. Respond in plain text only. No markdown, no asterisks, no pound signs.';
 
   var prompt = 'I am representing the ' + side + '.\n' +
     'Property: ' + addr + '\n' +
+    dealDetails +
     'List Price: $' + ask.toLocaleString() + '\n' +
     'Offer/Counter Price: $' + ofr.toLocaleString() + ' (' + diffPct + '% ' + diffDir + ')\n' +
     'Days on Market: ' + dom + '\n' +
     'Contingencies: ' + contingencyStr + '\n' +
-    'Seller Motivation: ' + motiv + '\n' +
+    'Motivation Level: ' + motiv + '\n' +
     'Requested Closing: ' + close + '\n' +
     'Special Terms: ' + terms + '\n\n' +
     'Generate exactly 4 sections with these EXACT labels on their own lines:\n\n' +
@@ -781,7 +1134,8 @@ async function runOffer() {
 var _emails = [];
 
 async function runFollowUp() {
-  var leadType  = document.getElementById('fuLeadType').value;
+  var mode = document.body.classList.contains('mode-commercial') ? 'commercial' : 'residential';
+  var leadType  = mode === 'commercial' ? document.getElementById('fuLeadTypeCRE').value : document.getElementById('fuLeadType').value;
   var clientName= document.getElementById('fuName').value.trim()      || 'the client';
   var situation = document.getElementById('fuSituation').value.trim() || 'interested buyer or seller, details not provided';
   var agentName = document.getElementById('fuAgent').value.trim()     || 'Your Agent';
@@ -792,7 +1146,9 @@ async function runFollowUp() {
   hideEl('fuResults');
   _emails = [];
 
-  var system = 'You are a highly gifted master genius real estate agent with 40 years of experience and deep mastery of client psychology. You write emails that feel genuinely personal, never templated. Your sequences convert leads at 3x the industry average. Respond in plain text only. No markdown, no asterisks, no pound signs.';
+  var system = mode === 'commercial'
+    ? 'You are a highly gifted master genius commercial real estate broker with 40 years of experience and deep mastery of investor and tenant psychology. You write emails that feel genuinely personal, never templated, and speak fluently about deal terms, cap rates, and timelines. Your sequences convert leads at 3x the industry average. Respond in plain text only. No markdown, no asterisks, no pound signs.'
+    : 'You are a highly gifted master genius real estate agent with 40 years of experience and deep mastery of client psychology. You write emails that feel genuinely personal, never templated. Your sequences convert leads at 3x the industry average. Respond in plain text only. No markdown, no asterisks, no pound signs.';
 
   // Use numbered delimiters that are highly reliable to parse
   var prompt = 'Client name: ' + clientName + '\n' +
@@ -874,39 +1230,73 @@ function copyActiveEmail() {
    TOOL 5 — LISTING DESCRIPTION GENERATOR
 ═══════════════════════════════════════════════════════ */
 async function runListing() {
+  var mode = document.body.classList.contains('mode-commercial') ? 'commercial' : 'residential';
   var features = document.getElementById('ldFeatures').value.trim();
-  if (!features) { alert('Please enter the property features.'); return; }
+  if (!features) { alert('Please enter the property ' + (mode === 'commercial' ? 'specs' : 'features') + '.'); return; }
 
-  var bedBath  = document.getElementById('ldBedBath').value.trim() || 'not specified';
-  var sqft     = document.getElementById('ldSqft').value.trim();
-  var propType = document.getElementById('ldType').value;
-  var location = document.getElementById('ldLocation').value.trim() || 'desirable neighborhood';
-  var buyer    = document.getElementById('ldBuyer').value;
+  var location = document.getElementById('ldLocation').value.trim() || (mode === 'commercial' ? 'strong trade area' : 'desirable neighborhood');
   var listPrice= document.getElementById('ldPrice').value.trim()  || 'priced competitively';
 
   disableBtn('ldBtn');
   showLoading('ldLoading');
   clearEl('ldResults');
 
-  var system = 'You are a highly gifted master genius real estate copywriter with 40 years of experience. Your listing descriptions consistently sell homes faster and above asking price. You understand buyer psychology, SEO and GEO optimization for property platforms, and how to create emotional urgency in copy. Respond in plain text only. No markdown, no asterisks, no pound signs.';
+  var system, prompt;
 
-  var prompt = 'Property details:\n' +
-    'Beds/Baths: ' + bedBath + '\n' +
-    'Square Footage: ' + (sqft ? sqft + ' sqft' : 'not specified') + '\n' +
-    'Property Type: ' + propType + '\n' +
-    'Features and upgrades: ' + features + '\n' +
-    'Location highlights: ' + location + '\n' +
-    'Target buyer: ' + buyer + '\n' +
-    'Listing price: ' + listPrice + '\n\n' +
-    'Generate exactly 4 sections with these EXACT labels on their own lines:\n\n' +
-    '[MLS DESCRIPTION]\n' +
-    'Write a 200-250 word MLS listing description. Open with the single most emotionally compelling hook sentence. Build desire throughout. End with a strong call to action.\n\n' +
-    '[SHORT DESCRIPTION]\n' +
-    'Write a 75-word version for social media, flyers, and email blasts. Punchy and compelling.\n\n' +
-    '[HEADLINE OPTIONS]\n' +
-    'Write 5 compelling marketing headline options, numbered 1 through 5. These are for flyers, ads, and social posts.\n\n' +
-    '[SEO SCORE]\n' +
-    'Rate this listing description\'s SEO strength from 1 to 10. List the top 5 keywords naturally embedded in the description. Explain specifically what would push the score higher.';
+  if (mode === 'commercial') {
+    var buildingClass = document.getElementById('ldBuildingClass').value;
+    var sqftCRE  = document.getElementById('ldSqftCRE').value.trim();
+    var propType = document.getElementById('ldTypeCRE').value;
+    var buyer    = document.getElementById('ldBuyerCRE').value;
+    var leaseRate= document.getElementById('ldLeaseRate').value.trim();
+    var leaseType= document.getElementById('ldLeaseType').value;
+
+    system = 'You are a highly gifted master genius commercial real estate copywriter with 40 years of experience representing office, retail, industrial, and multifamily properties. Your listing descriptions are written for investors, brokers, and acquisitions teams — you lead with hard numbers (cap rate, NOI, price per square foot) and technical building specifications, not emotional buyer language. Respond in plain text only. No markdown, no asterisks, no pound signs.';
+
+    prompt = 'Property details:\n' +
+      'Building Class: ' + buildingClass + '\n' +
+      'Total/Leasable Sq Ft: ' + (sqftCRE ? sqftCRE + ' SF' : 'not specified') + '\n' +
+      'Property Type: ' + propType + '\n' +
+      'Building specs: ' + features + '\n' +
+      'Trade area & access: ' + location + '\n' +
+      'Target buyer: ' + buyer + '\n' +
+      'Sale price: ' + listPrice + '\n' +
+      (leaseRate ? ('Lease rate: ' + leaseRate + ' (' + leaseType + ')\n') : '') + '\n' +
+      'Generate exactly 4 sections with these EXACT labels on their own lines:\n\n' +
+      '[MLS DESCRIPTION]\n' +
+      'Write a 200-250 word commercial listing description for LoopNet/CoStar-style platforms. Lead with the key investment metrics and building specs. Address the target buyer\'s priorities directly (cap rate for investors, zoning/access for developers, etc). End with a clear call to action for a broker tour or OM request.\n\n' +
+      '[SHORT DESCRIPTION]\n' +
+      'Write a 75-word version for broker email blasts and marketing flyers. Lead with the single most compelling investment metric or building feature.\n\n' +
+      '[HEADLINE OPTIONS]\n' +
+      'Write 5 compelling marketing headline options, numbered 1 through 5, for flyers and broker cold emails.\n\n' +
+      '[SEO SCORE]\n' +
+      'Rate this listing description\'s SEO strength from 1 to 10 for commercial listing platforms. List the top 5 keywords naturally embedded. Explain specifically what would push the score higher.';
+  } else {
+    var bedBath  = document.getElementById('ldBedBath').value.trim() || 'not specified';
+    var sqft     = document.getElementById('ldSqft').value.trim();
+    var propType2= document.getElementById('ldType').value;
+    var buyer2   = document.getElementById('ldBuyer').value;
+
+    system = 'You are a highly gifted master genius real estate copywriter with 40 years of experience. Your listing descriptions consistently sell homes faster and above asking price. You understand buyer psychology, SEO and GEO optimization for property platforms, and how to create emotional urgency in copy. Respond in plain text only. No markdown, no asterisks, no pound signs.';
+
+    prompt = 'Property details:\n' +
+      'Beds/Baths: ' + bedBath + '\n' +
+      'Square Footage: ' + (sqft ? sqft + ' sqft' : 'not specified') + '\n' +
+      'Property Type: ' + propType2 + '\n' +
+      'Features and upgrades: ' + features + '\n' +
+      'Location highlights: ' + location + '\n' +
+      'Target buyer: ' + buyer2 + '\n' +
+      'Listing price: ' + listPrice + '\n\n' +
+      'Generate exactly 4 sections with these EXACT labels on their own lines:\n\n' +
+      '[MLS DESCRIPTION]\n' +
+      'Write a 200-250 word MLS listing description. Open with the single most emotionally compelling hook sentence. Build desire throughout. End with a strong call to action.\n\n' +
+      '[SHORT DESCRIPTION]\n' +
+      'Write a 75-word version for social media, flyers, and email blasts. Punchy and compelling.\n\n' +
+      '[HEADLINE OPTIONS]\n' +
+      'Write 5 compelling marketing headline options, numbered 1 through 5. These are for flyers, ads, and social posts.\n\n' +
+      '[SEO SCORE]\n' +
+      'Rate this listing description\'s SEO strength from 1 to 10. List the top 5 keywords naturally embedded in the description. Explain specifically what would push the score higher.';
+  }
 
   try {
     var raw = await callClaude(system, prompt, 2000);
@@ -931,49 +1321,75 @@ async function runListing() {
    TOOL 6 — OPEN HOUSE PLAYBOOK
 ═══════════════════════════════════════════════════════ */
 async function runOpenHouse() {
+  var mode = document.body.classList.contains('mode-commercial') ? 'commercial' : 'residential';
   var addr = document.getElementById('ohAddr').value.trim();
   if (!addr) { alert('Please enter the property address.'); return; }
 
-  var highlights = document.getElementById('ohHighlights').value.trim() || 'great home in a desirable area';
+  var highlights = document.getElementById('ohHighlights').value.trim() || (mode === 'commercial' ? 'strong asset in a growing trade area' : 'great home in a desirable area');
   var budget     = document.getElementById('ohBudget').value.trim()     || '300';
-  var visitor    = document.getElementById('ohVisitor').value;
+  var visitor    = mode === 'commercial' ? document.getElementById('ohVisitorCRE').value : document.getElementById('ohVisitor').value;
   var dateTime   = document.getElementById('ohDate').value.trim()       || 'this weekend';
 
   disableBtn('ohBtn');
   showLoading('ohLoading');
   clearEl('ohResults');
 
-  var system = 'You are an 1% highly gifted elite genius real estate agent with 40 years of experience specializing in open house strategy. You have hosted over 4,000 open houses and convert leads at 3x the national average. You know instantly how to read visitors, qualify serious buyers, and convert tire-kickers. Respond in plain text only. No markdown, no asterisks, no pound signs.';
+  var system, prompt;
 
-  var prompt = 'Property: ' + addr + '\n' +
-    'Key Highlights: ' + highlights + '\n' +
-    'Budget: $' + budget + '\n' +
-    'Expected visitor type: ' + visitor + '\n' +
-    'Date and time: ' + dateTime + '\n\n' +
-    'Generate exactly 4 sections with these EXACT labels on their own lines:\n\n' +
-    '[BUDGET BREAKDOWN]\n' +
-    'Show how to allocate the $' + budget + ' budget for maximum ROI. Itemize staging items, food and drinks, signage, digital ads, and any other line items. Include specific dollar amounts for each. Make it practical and ready to execute.\n\n' +
-    '[AGENT SCRIPT]\n' +
-    'Write a complete word-for-word open house script including: warm greeting at the door, 3 property tour talking points that build desire, how to handle price objections without going below list, and the exact closing line that gets every visitor to give their contact info.\n\n' +
-    '[LEAD QUALIFICATION QUESTIONS]\n' +
-    'Write 6 questions to ask every visitor that reveal whether they are a real buyer, their timeline, their budget, and their true motivation — without feeling like an interrogation. Number them 1 through 6. Include a brief note on what each question reveals.\n\n' +
-    '[FOLLOW UP PLAN]\n' +
-    'Write 3 complete follow-up email templates:\n' +
-    'Template A: For a Serious Buyer — ready, pre-approved, high interest\n' +
-    'Template B: For an Undecided Maybe — showed interest but not committed\n' +
-    'Template C: For a Neighbor or Tire-Kicker — probably not buying but may refer someone\n' +
-    'Each template should be 80-100 words, ready to copy-paste.';
+  if (mode === 'commercial') {
+    system = 'You are a highly gifted elite genius commercial real estate broker with 40 years of experience specializing in property tours and broker preview events for office, retail, industrial, and multifamily assets. You know instantly how to read institutional investors and developers, qualify serious capital, and convert broker previews into offers. Respond in plain text only. No markdown, no asterisks, no pound signs.';
+
+    prompt = 'Property: ' + addr + '\n' +
+      'Key Investment Highlights: ' + highlights + '\n' +
+      'Budget: $' + budget + '\n' +
+      'Expected attendee type: ' + visitor + '\n' +
+      'Date and time: ' + dateTime + '\n\n' +
+      'Generate exactly 4 sections with these EXACT labels on their own lines:\n\n' +
+      '[BUDGET BREAKDOWN]\n' +
+      'Show how to allocate the $' + budget + ' budget for maximum ROI on a broker preview or investor tour. Itemize signage, printed offering memorandum copies, refreshments for a professional audience, and any digital/broker network promotion. Include specific dollar amounts for each. Make it practical and ready to execute.\n\n' +
+      '[TOUR SCRIPT]\n' +
+      'Write a complete word-for-word property tour script including: professional greeting, 3 key talking points that lead with investment metrics and building specs, how to handle price/cap-rate objections without discounting prematurely, and the exact closing line that gets every attendee to request the offering memorandum or schedule a follow-up call.\n\n' +
+      '[QUALIFICATION QUESTIONS]\n' +
+      'Write 6 questions to ask every attendee that reveal whether they are a real capital source, their investment timeline, their acquisition criteria, and their true intent — without feeling like an interrogation. Number them 1 through 6. Include a brief note on what each question reveals.\n\n' +
+      '[FOLLOW UP PLAN]\n' +
+      'Write 3 complete follow-up email templates:\n' +
+      'Template A: For a Serious Buyer — ready capital, clear acquisition criteria match\n' +
+      'Template B: For an Undecided Investor — showed interest but needs more underwriting time\n' +
+      'Template C: For a Broker or Tire-Kicker — probably not transacting but may refer another buyer\n' +
+      'Each template should be 80-100 words, ready to copy-paste.';
+  } else {
+    system = 'You are an 1% highly gifted elite genius real estate agent with 40 years of experience specializing in open house strategy. You have hosted over 4,000 open houses and convert leads at 3x the national average. You know instantly how to read visitors, qualify serious buyers, and convert tire-kickers. Respond in plain text only. No markdown, no asterisks, no pound signs.';
+
+    prompt = 'Property: ' + addr + '\n' +
+      'Key Highlights: ' + highlights + '\n' +
+      'Budget: $' + budget + '\n' +
+      'Expected visitor type: ' + visitor + '\n' +
+      'Date and time: ' + dateTime + '\n\n' +
+      'Generate exactly 4 sections with these EXACT labels on their own lines:\n\n' +
+      '[BUDGET BREAKDOWN]\n' +
+      'Show how to allocate the $' + budget + ' budget for maximum ROI. Itemize staging items, food and drinks, signage, digital ads, and any other line items. Include specific dollar amounts for each. Make it practical and ready to execute.\n\n' +
+      '[AGENT SCRIPT]\n' +
+      'Write a complete word-for-word open house script including: warm greeting at the door, 3 property tour talking points that build desire, how to handle price objections without going below list, and the exact closing line that gets every visitor to give their contact info.\n\n' +
+      '[LEAD QUALIFICATION QUESTIONS]\n' +
+      'Write 6 questions to ask every visitor that reveal whether they are a real buyer, their timeline, their budget, and their true motivation — without feeling like an interrogation. Number them 1 through 6. Include a brief note on what each question reveals.\n\n' +
+      '[FOLLOW UP PLAN]\n' +
+      'Write 3 complete follow-up email templates:\n' +
+      'Template A: For a Serious Buyer — ready, pre-approved, high interest\n' +
+      'Template B: For an Undecided Maybe — showed interest but not committed\n' +
+      'Template C: For a Neighbor or Tire-Kicker — probably not buying but may refer someone\n' +
+      'Each template should be 80-100 words, ready to copy-paste.';
+  }
 
   try {
     var raw = await callClaude(system, prompt, 2200);
     var s1 = extractSection(raw, 'BUDGET BREAKDOWN');
-    var s2 = extractSection(raw, 'AGENT SCRIPT');
-    var s3 = extractSection(raw, 'LEAD QUALIFICATION QUESTIONS');
+    var s2 = extractSection(raw, mode === 'commercial' ? 'TOUR SCRIPT' : 'AGENT SCRIPT');
+    var s3 = extractSection(raw, mode === 'commercial' ? 'QUALIFICATION QUESTIONS' : 'LEAD QUALIFICATION QUESTIONS');
     var s4 = extractSection(raw, 'FOLLOW UP PLAN');
     document.getElementById('ohResults').innerHTML =
       makeSection('💵 Budget Breakdown & ROI Allocation', s1 || raw) +
-      makeSection('🎤 Complete Agent Script', s2) +
-      makeSection('🔍 Lead Qualification Questions', s3) +
+      makeSection(mode === 'commercial' ? '🎤 Complete Tour Script' : '🎤 Complete Agent Script', s2) +
+      makeSection('🔍 Qualification Questions', s3) +
       makeSection('📬 Post-Event Follow-Up Templates (3 types)', s4);
   } catch(e) {
     showError('ohResults', e.message);
@@ -987,12 +1403,16 @@ async function runOpenHouse() {
    TOOL 7 — TRANSACTION DEADLINE TRACKER
 ═══════════════════════════════════════════════════════ */
 function runTimeline() {
+  var mode = document.body.classList.contains('mode-commercial') ? 'commercial' : 'residential';
   var contractVal = document.getElementById('tlContract').value;
   var closeVal    = document.getElementById('tlClose').value;
-  var loanType    = document.getElementById('tlType').value;
+  var loanType    = mode === 'commercial' ? document.getElementById('tlTypeCRE').value : document.getElementById('tlType').value;
   var state       = document.getElementById('tlState').value.trim();
-  var hoa         = document.getElementById('tlHOA').checked;
-  var septic      = document.getElementById('tlSeptic').checked;
+  var hoa         = mode === 'residential' && document.getElementById('tlHOA').checked;
+  var septic      = mode === 'residential' && document.getElementById('tlSeptic').checked;
+  var enviro      = mode === 'commercial' && document.getElementById('tlEnviro').checked;
+  var zoning      = mode === 'commercial' && document.getElementById('tlZoning').checked;
+  var estoppel    = mode === 'commercial' && document.getElementById('tlEstoppel').checked;
 
   if (!contractVal) { alert('Please enter the contract acceptance date.'); return; }
   if (!closeVal)    { alert('Please enter the target closing date.'); return; }
@@ -1027,36 +1447,66 @@ function runTimeline() {
     return diff + ' days left';
   }
 
-  var isCash    = loanType === 'cash';
-  var isVA      = loanType === 'va';
-  var isFHA     = loanType === 'fha';
-  var inspDays  = isCash ? 7  : 10;
-  var apprOrd   = isCash ? 0  : (isVA ? 18 : 14);
-  var apprDl    = isCash ? 0  : (isVA ? 25 : 21);
-  var loanCommit= isCash ? 0  : Math.round(totalDays * 0.72);
-  var titleDays = Math.round(totalDays * 0.42);
-
   var ms = [];
-  ms.push({ label: '📋 Contract Acceptance',          date: contract,                     note: 'Day 0 — Start ALL clocks immediately.' });
-  if (!isCash) {
-    ms.push({ label: '📑 Loan Application Submitted', date: addDays(contract, 3),         note: 'Buyer must formally apply — do not let this drift past day 3.' });
+
+  if (mode === 'commercial') {
+    var isCash    = loanType === 'cash';
+    var ddDays    = Math.min(45, Math.round(totalDays * 0.35));
+    var loanCommit= isCash ? 0 : Math.round(totalDays * 0.82);
+    var titleDays = Math.round(totalDays * 0.45);
+
+    ms.push({ label: '📋 Contract / PSA Executed',      date: contract,                    note: 'Day 0 — Start ALL clocks immediately.' });
+    if (!isCash) {
+      ms.push({ label: '📑 Loan Application Submitted', date: addDays(contract, 5),        note: 'CRE lenders need full financials — submit within a week of signing.' });
+    }
+    ms.push({ label: '🔍 Due Diligence Period Ends',    date: addDays(contract, ddDays),   note: ddDays + ' days — inspections, leases, financials, and title review must wrap by this date.' });
+    if (enviro) {
+      ms.push({ label: '🌱 Phase I Environmental Review', date: addDays(contract, Math.min(30, ddDays)), note: 'Order immediately — a Phase II (if triggered) can add 30-60 more days.' });
+    }
+    if (zoning) {
+      ms.push({ label: '🏛️ Zoning / Entitlement Approval', date: addDays(contract, Math.round(totalDays * 0.6)), note: 'Municipal timelines vary widely — confirm with the local planning office early.' });
+    }
+    if (!isCash) {
+      ms.push({ label: '💳 Loan Commitment Deadline',   date: addDays(contract, loanCommit), note: 'Day ' + loanCommit + ' — CRE underwriting runs longer than residential; confirm lender timeline weekly.' });
+    }
+    if (estoppel) {
+      ms.push({ label: '📜 Tenant Estoppel Certificates Due', date: addDays(contract, totalDays - 15), note: 'Request from all tenants at least 15 days before closing — some leases require 30-day notice.' });
+    }
+    ms.push({ label: '📁 Title Search Cleared',          date: addDays(contract, titleDays), note: 'Day ' + titleDays + ' — any lien, easement, or title cloud must be flagged and resolved now.' });
+    ms.push({ label: '🔐 Final Walkthrough',             date: addDays(contract, totalDays - 1), note: '24–48 hrs before closing — verify property condition and any lease/tenant changes.' });
+    ms.push({ label: '💰 Wire Funds',                    date: addDays(contract, totalDays - 1), note: 'Always verify wire instructions by phone — wire fraud is rampant in CRE closings.' });
+    ms.push({ label: '🎉 CLOSING DAY',                   date: closing,                     note: 'The finish line — confirm recorded deed and disbursement with title/escrow.' });
+  } else {
+    var isCash    = loanType === 'cash';
+    var isVA      = loanType === 'va';
+    var isFHA     = loanType === 'fha';
+    var inspDays  = isCash ? 7  : 10;
+    var apprOrd   = isCash ? 0  : (isVA ? 18 : 14);
+    var apprDl    = isCash ? 0  : (isVA ? 25 : 21);
+    var loanCommit= isCash ? 0  : Math.round(totalDays * 0.72);
+    var titleDays = Math.round(totalDays * 0.42);
+
+    ms.push({ label: '📋 Contract Acceptance',          date: contract,                     note: 'Day 0 — Start ALL clocks immediately.' });
+    if (!isCash) {
+      ms.push({ label: '📑 Loan Application Submitted', date: addDays(contract, 3),         note: 'Buyer must formally apply — do not let this drift past day 3.' });
+    }
+    ms.push({ label: '🔍 Inspection Period Deadline',   date: addDays(contract, inspDays),  note: inspDays + ' days — schedule inspection within 24 hrs of acceptance.' });
+    if (hoa) {
+      ms.push({ label: '🏘️ HOA Docs Requested',         date: addDays(contract, inspDays),  note: 'Request same day as inspection — boards are slow, budgets take time.' });
+    }
+    if (septic) {
+      ms.push({ label: '💧 Septic Inspection',           date: addDays(contract, inspDays + 2), note: 'Book immediately — certified inspectors book up fast.' });
+    }
+    if (!isCash) {
+      ms.push({ label: '📬 Appraisal Ordered',           date: addDays(contract, apprOrd),  note: 'Day ' + apprOrd + ' — order early, appraisers run 1-2 week backlogs.' });
+      ms.push({ label: '🏡 Appraisal Deadline',          date: addDays(contract, apprDl),   note: 'Day ' + apprDl + ' — a low value can kill the deal without a renegotiation clause.' });
+      ms.push({ label: '💳 Loan Commitment Deadline',   date: addDays(contract, loanCommit),note: 'Day ' + loanCommit + ' — lender must formally commit. Missing this can void the contract.' });
+    }
+    ms.push({ label: '📁 Title Search Cleared',          date: addDays(contract, titleDays), note: 'Day ' + titleDays + ' — any lien or cloud on title must be flagged and resolved now.' });
+    ms.push({ label: '🔐 Final Walkthrough',             date: addDays(contract, totalDays - 1), note: '24–48 hrs before closing — verify all agreed repairs completed, condition unchanged.' });
+    ms.push({ label: '💰 Wire Funds / Cashier\'s Check', date: addDays(contract, totalDays - 1), note: 'Always verify wire instructions by phone — wire fraud is rampant.' });
+    ms.push({ label: '🎉 CLOSING DAY',                   date: closing,                     note: 'The finish line — stay on schedule and celebrate your client!' });
   }
-  ms.push({ label: '🔍 Inspection Period Deadline',   date: addDays(contract, inspDays),  note: inspDays + ' days — schedule inspection within 24 hrs of acceptance.' });
-  if (hoa) {
-    ms.push({ label: '🏘️ HOA Docs Requested',         date: addDays(contract, inspDays),  note: 'Request same day as inspection — boards are slow, budgets take time.' });
-  }
-  if (septic) {
-    ms.push({ label: '💧 Septic Inspection',           date: addDays(contract, inspDays + 2), note: 'Book immediately — certified inspectors book up fast.' });
-  }
-  if (!isCash) {
-    ms.push({ label: '📬 Appraisal Ordered',           date: addDays(contract, apprOrd),  note: 'Day ' + apprOrd + ' — order early, appraisers run 1-2 week backlogs.' });
-    ms.push({ label: '🏡 Appraisal Deadline',          date: addDays(contract, apprDl),   note: 'Day ' + apprDl + ' — a low value can kill the deal without a renegotiation clause.' });
-    ms.push({ label: '💳 Loan Commitment Deadline',   date: addDays(contract, loanCommit),note: 'Day ' + loanCommit + ' — lender must formally commit. Missing this can void the contract.' });
-  }
-  ms.push({ label: '📁 Title Search Cleared',          date: addDays(contract, titleDays), note: 'Day ' + titleDays + ' — any lien or cloud on title must be flagged and resolved now.' });
-  ms.push({ label: '🔐 Final Walkthrough',             date: addDays(contract, totalDays - 1), note: '24–48 hrs before closing — verify all agreed repairs completed, condition unchanged.' });
-  ms.push({ label: '💰 Wire Funds / Cashier\'s Check', date: addDays(contract, totalDays - 1), note: 'Always verify wire instructions by phone — wire fraud is rampant.' });
-  ms.push({ label: '🎉 CLOSING DAY',                   date: closing,                     note: 'The finish line — stay on schedule and celebrate your client!' });
 
   // Sort by date
   ms.sort(function(a, b){ return a.date.getTime() - b.date.getTime(); });
@@ -1073,18 +1523,25 @@ function runTimeline() {
   showEl('tlOutput');
 
   // Fire AI tips
-  getTimelineTips(loanType, state, totalDays, hoa, septic);
+  getTimelineTips(loanType, state, totalDays, hoa || enviro, septic || zoning || estoppel, mode);
 }
 
-async function getTimelineTips(loanType, state, totalDays, hoa, septic) {
+async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
   showLoading('tlLoading');
   clearEl('tlAIResults');
 
-  var system = 'You are a highly gifted genius real estate transaction coordinator and licensed broker with 40 years of experience and thousands of closed deals across all 50 states. Respond in plain text only. No markdown, no asterisks, no pound signs.';
+  var system = mode === 'commercial'
+    ? 'You are a highly gifted genius commercial real estate transaction coordinator and licensed broker with 40 years of experience and thousands of closed CRE deals across all 50 states, including office, retail, industrial, and multifamily. Respond in plain text only. No markdown, no asterisks, no pound signs.'
+    : 'You are a highly gifted genius real estate transaction coordinator and licensed broker with 40 years of experience and thousands of closed deals across all 50 states. Respond in plain text only. No markdown, no asterisks, no pound signs.';
 
   var extras = [];
-  if (hoa)    extras.push('HOA approval required');
-  if (septic) extras.push('septic inspection needed');
+  if (mode === 'commercial') {
+    if (condA) extras.push('Phase I environmental review');
+    if (condB) extras.push('zoning/entitlement or tenant estoppel requirements');
+  } else {
+    if (condA) extras.push('HOA approval required');
+    if (condB) extras.push('septic inspection needed');
+  }
 
   var prompt = 'Transaction details:\n' +
     'Loan type: ' + loanType + '\n' +
@@ -1093,9 +1550,9 @@ async function getTimelineTips(loanType, state, totalDays, hoa, septic) {
     (extras.length ? 'Special conditions: ' + extras.join(', ') + '\n' : '') +
     '\nGenerate exactly 2 sections with these EXACT labels on their own lines:\n\n' +
     '[EXPERT TIPS]\n' +
-    'Write 5 specific expert warnings and pro tips for this exact transaction type that most agents miss or overlook. Be brutally specific about what kills deals and what saves them. Number each tip 1 through 5.\n\n' +
+    'Write 5 specific expert warnings and pro tips for this exact transaction type that most agents/brokers miss or overlook. Be brutally specific about what kills deals and what saves them. Number each tip 1 through 5.\n\n' +
     '[AGENT CHECKLIST]\n' +
-    'Write a 10-item week-by-week action checklist for the agent from contract to close. Organize by timing (Week 1, Week 2, etc.). Number each item.';
+    'Write a 10-item week-by-week action checklist from contract to close. Organize by timing (Week 1, Week 2, etc.). Number each item.';
 
   try {
     var raw = await callClaude(system, prompt, 1600);
@@ -1103,7 +1560,7 @@ async function getTimelineTips(loanType, state, totalDays, hoa, septic) {
     var s2 = extractSection(raw, 'AGENT CHECKLIST');
     document.getElementById('tlAIResults').innerHTML =
       makeSection('🧠 Expert Tips for Your Transaction Type', s1 || raw) +
-      makeSection('✅ Agent Week-by-Week Action Checklist', s2);
+      makeSection('✅ Week-by-Week Action Checklist', s2);
   } catch(e) {
     document.getElementById('tlAIResults').innerHTML =
       '<div class="err-box">Could not load AI tips: ' + escHTML(e.message) + '</div>';
@@ -1120,9 +1577,9 @@ async function getTimelineTips(loanType, state, totalDays, hoa, septic) {
 
   var MIC_SVG = '<svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3z"/><path d="M19 11a7 7 0 01-14 0"/><line x1="12" y1="18" x2="12" y2="22"/></svg>';
 
-  var numberFieldIds = ['salePrice','commRate','listSplit','buySplit','agentSplit','fees','offerAsk','offerPrice','offerDOM','ohBudget'];
-  var textFieldIds = ['mktSpecs','mktNeighborhood','mktPrice','offerAddr','offerClose','offerTerms','fuName','fuSituation','fuAgent','ldBedBath','ldSqft','ldFeatures','ldLocation','ldPrice','ohAddr','ohHighlights','ohDate','tlState'];
-  var selectFieldIds = ['offerSide','offerMotivation','fuLeadType','fuTone','ldType','ldBuyer','ohVisitor','tlType'];
+  var numberFieldIds = ['salePrice','commRate','listSplit','buySplit','agentSplit','fees','offerAsk','offerPrice','offerDOM','ohBudget','noi','downPayment','debtService','commSqft','ldSqftCRE','offerLeaseTerm'];
+  var textFieldIds = ['mktSpecs','mktNeighborhood','mktPrice','offerAddr','offerClose','offerTerms','fuName','fuSituation','fuAgent','ldBedBath','ldSqft','ldFeatures','ldLocation','ldPrice','ohAddr','ohHighlights','ohDate','tlState','ldLeaseRate','offerBaseRent','offerCAM','offerTI'];
+  var selectFieldIds = ['offerSide','offerMotivation','fuLeadType','fuTone','ldType','ldBuyer','ohVisitor','tlType','commPropType','ldBuildingClass','ldTypeCRE','ldBuyerCRE','ldLeaseType','offerDealType','fuLeadTypeCRE','ohVisitorCRE','tlTypeCRE'];
 
   var WORD_NUMS = {zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,
     eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,
@@ -1416,59 +1873,4 @@ async function getTimelineTips(loanType, state, totalDays, hoa, septic) {
         </p>
     </div>
     
-    <a href="https://buy.stripe.com/dRmbJ24H22Jpa5X5cMdwc01" target="_blank" style="display: inline-block; width: 100%; max-width: 340px; padding: 16px 24px; background-color: #000000; color: #ffffff; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; border-radius: 6px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); transition: transform 0.2s; text-align: center;">
-        ⚡ Secure Lifetime Access — Only $19.99
-    </a>
-    
-    <span style="display: block; font-size: 11px; color: #000000; margin-top: 16px; font-family: monospace; font-weight: 700;">🔒 Insured PCI-Compliant 256-Bit Stripe Checkout</span>
-</div>
-
-
-
-
-<div style="max-width: 800px; margin: 30px auto; padding: 25px; background: #111115; border: 1px solid #27272a; border-radius: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; box-shadow: 0 4px 20px rgba(0,0,0,0.4); text-align: left;">
-    
-    <div style="display: flex; align-items: center; margin-bottom: 15px;">
-        <span style="background: #d4af37; color: #000000; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; margin-right: 10px; letter-spacing: 0.5px;">PERRYMAN ASSETS ARCHITECTURE</span>
-        <h5 style="font-size: 15px; font-weight: 700; color: #ffffff; margin: 0; text-transform: uppercase; letter-spacing: 0.5px;">Verified Production Systems</h5>
-    </div>
-    
-    <p style="font-size: 13px; color: #a1a1aa; margin: 0 0 20px 0; line-height: 1.5;">
-        To deploy the matrices in our master vault at maximum scale, elite agents use the following standardized operational blueprints.
-    </p>
-
-    <div style="background: rgba(212, 175, 55, 0.03); border: 1px solid rgba(212, 175, 55, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
-        <div>
-            <span style="font-size: 14px; font-weight: 600; color: #ffffff; display: block; margin-bottom: 4px;">🤖 Open-Source AI Script Automation Hub</span>
-            <span style="font-size: 12px; color: #71717a;">Deploy raw script models directly into standard industry AI engines for instant variation.</span>
-        </div>
-        <a href="https://chatgpt.com" target="_blank" style="padding: 8px 16px; background: #d4af37; color: #000000; font-size: 11px; font-weight: 700; text-decoration: none; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;">Launch Engine →</a>
-    </div>
-
-   
-
-<footer style="max-width: 800px; margin: 20px auto 40px auto; padding: 20px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-    <hr style="border: 0; border-top: 1px solid #27272a; margin-bottom: 20px;">
-    <p style="font-size: 12px; color: #71717a; line-height: 1.6; margin: 0 0 8px 0;">
-        © 2026 <strong>Perryman’s Assets, LLC</strong>. All Rights Reserved.
-    </p>
-    <p style="font-size: 11px; color: #52525b; max-width: 650px; margin: 0 auto; line-height: 1.5; text-align: justify; text-justify: inter-word;">
-        <strong>Disclaimer &amp; Terms:</strong> The digital tools, systems, frameworks, and matrices provided within this toolkit are for informational and business acceleration purposes only. Perryman’s Assets, LLC does not guarantee specific transaction volumes, income increases, or specific market performance. Unauthorized duplication, reverse-engineering, or digital scraping of this platform wrapper or its nested assets is strictly prohibited and will be prosecuted to the fullest extent of corporate trademark and property law. Transactions are securely managed off-site via PCI-Compliant Stripe architecture.
-    </p>
-</footer>
-
-
-
-  <script>
-    // Disables right-click context menu
-    document.addEventListener('contextmenu', event => event.preventDefault());
-    
-    // Disables keyboard shortcuts for viewing source (Ctrl+U, Ctrl+Shift+I, F12)
-    document.onkeydown = function(e) {
-        if (e.keyCode == 123) return false; // F12
-        if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
-        if (e.ctrlKey && e.shiftKey && e.charCodeAt(0) == 'C') return false;
-        if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
-        if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
-    }
-</script>
+    <a href="https://buy.stripe.com/dRmbJ24H22Jpa5X5
