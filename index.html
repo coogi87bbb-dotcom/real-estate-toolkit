@@ -1352,6 +1352,32 @@ async function getTimelineTips(loanType, state, totalDays, hoa, septic) {
   }
 })();
 </script>
+<script>
+/* ── COMMISSION SPLIT AUTO-BALANCE (added) ── */
+(function(){
+  var listEl = document.getElementById('listSplit');
+  var buyEl = document.getElementById('buySplit');
+  if (!listEl || !buyEl) return;
+
+  function clamp(v){ return Math.max(0, Math.min(100, v)); }
+
+  listEl.addEventListener('input', function(){
+    var v = parseFloat(listEl.value);
+    if (!isNaN(v)){
+      buyEl.value = clamp(100 - v);
+      if (typeof calcCommission === 'function') calcCommission();
+    }
+  });
+
+  buyEl.addEventListener('input', function(){
+    var v = parseFloat(buyEl.value);
+    if (!isNaN(v)){
+      listEl.value = clamp(100 - v);
+      if (typeof calcCommission === 'function') calcCommission();
+    }
+  });
+})();
+</script>
 </body>
 </html>
 
