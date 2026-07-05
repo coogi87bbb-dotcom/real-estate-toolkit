@@ -1,3 +1,133 @@
+
+Claude finished the response
+
+Mapping tool labels to toggle between commercial and residential sections
+Mapping tool labels to toggle between commercial and residential sections
+Good catch. Let's add IDs to each nav button and swap the label text based on mode:
+
+
+Edited 2 files, ran a command, viewed a file
+Edited 2 files, ran a command, viewed a file
+Let's validate and copy the final file:
+
+
+Validate syntax and ID references after nav label swap addition
+Validate syntax and ID references after nav label swap addition
+All valid.
+
+
+Ran a command, read a file
+Ran a command, read a file
+Fixed — the top nav tabs now relabel themselves when you toggle:
+
+Residential	Commercial
+💰 Commission	💰 Commission & Cap Rate
+📣 Marketing	📣 Investor Marketing
+🤝 Offer & Counter	🤝 Offer & Lease Terms
+📧 Follow-Up	📧 Investor Follow-Up
+🏠 Listing Copy	🏢 Listing Copy
+🗝️ Open House	🏢 Property Tour
+📅 Deadlines	📅 CRE Deadlines
+Same toggle, same persistence — switching modes now updates both the tab names up top and everything inside each panel.
+
+
+Index
+Code · HTML 
+Screenshot 2026-07-05 12.33.03 PM.png
+
+I notice the user prompt is empty, so I cannot determine the primary language or provide a summary. Please provide the user's actual prompt so I can create an appropriate summary
+I notice the user prompt is empty, so I cannot determine the primary language or provide a summary. Please provide the user's actual prompt so I can create an appropriate summary
+Good news — I checked the actual file, and it's complete: 1,931 lines total, ending properly with the disclaimer footer and the closing </script> tag, exactly as it should. Nothing is cut off or corrupted.
+
+What you're hitting at line 1876 is just GitHub's web editor struggling to scroll, not a real problem with the file. A few of those lines (that Stripe promo section) are extremely long single lines of inline-styled HTML, and GitHub's in-browser editor can lag or appear to "stop" scrolling on files with very long lines like that.
+
+Try any of these:
+
+Refresh the page and scroll again — often just a rendering hiccup
+Use Ctrl+End (or Cmd+End on Mac) to jump straight to the end of the file instead of scrolling
+Switch to the Preview tab you have open next to Edit, or view the raw file (?plain=1 in the URL, or the "Raw" button) instead of the CodeMirror editor — raw view handles long lines better
+The file itself is fine — this is a display quirk in GitHub's editor, not data loss.
+
+Screenshot 2026-07-05 12.37.02 PM.png
+
+The user prompt is empty, so I cannot determine the primary language or provide a meaningful summary. Please provide a user prompt for me to summarize the thinking block against
+The user prompt is empty, so I cannot determine the primary language or provide a meaningful summary. Please provide a user prompt for me to summarize the thinking block against
+That's actually a totally normal GitHub screen — not a problem. Here's what's happening:
+
+You're on the Commit changes screen in GitHub's editor, which only shows a diff (the lines that changed), not the whole file
+It's showing exactly one line (1876) changed, with everything above and below unchanged — that's why the rest of the screen is blank. GitHub diffs never display unchanged lines beyond a bit of context.
+One thing worth double-checking: the old (red) and new (green) versions of that line look identical in the screenshot — both just <a href="https://buy.stripe.com/dRmbJ24H22Jpa5X5.... If you didn't intentionally edit that line, this might just be a whitespace or line-ending change picked up automatically, which is harmless but worth knowing about.
+
+What to do:
+
+If you meant to make this edit (or don't mind it either way) → click Commit changes... and you're done
+If you're not sure what changed or didn't mean to touch this line → click Cancel changes to back out safely, since nothing is lost
+Did you intentionally edit that Stripe link, or did this diff show up on its own?
+
+it cut off the bottom of the website smh [www.ailogflow.com](https://www.ailogflow.com)
+
+
+Investigated deployment discrepancy and rendering issue
+Investigated deployment discrepancy and rendering issue
+I just checked the live site, and here's what's odd: it's still showing the old version entirely — still $5 pricing, no Residential/Commercial toggle, none of the commercial fields we built. So whatever got committed to GitHub doesn't appear to be live yet, or there's a caching layer in between.
+
+And looking at everything I can retrieve from the page right now, the bottom section (Perryman Assets Architecture, the disclaimer, everything) is fully intact — nothing looks cut off from what I can see.
+
+A few things this could be:
+
+The commit from that diff screen didn't actually go through, or went to a branch that isn't published
+GitHub Pages hasn't rebuilt yet — there's usually a short delay (30 seconds to a couple minutes) after a commit before the live site updates
+Your browser is showing a cached version of the page from before a real change happened
+Can you send me a screenshot of what you're actually seeing cut off on ailogflow.com? That'll tell me if it's a real content problem or a caching issue. Also — did you click "Commit changes" on that diff screen from before, or did you cancel it? That determines whether anything even changed on GitHub's end yet.
+
+can every example match commerical or residenucal
+
+
+Verifying function declarations across code sections
+Verifying function declarations across code sections
+Good call — right now only the Listing Description tool's Features/Location fields swap their example text; everything else still shows residential examples even in commercial mode. Let's fix that across all 7 tools.
+
+
+Ran a command, viewed a file
+Ran a command, viewed a file
+Now inserting the comprehensive placeholder-swap block right before calcCommission() runs:
+
+
+Identified unique code location and refined matching strategy
+Identified unique code location and refined matching strategy
+Now let's validate and copy the final file:
+
+
+Validate syntax and ID references after placeholder swap addition
+Validate syntax and ID references after placeholder swap addition
+All valid.
+
+
+Ran a command, read a file
+Ran a command, read a file
+Done — every example placeholder across all 7 tools now switches with the toggle. A few samples of what changes:
+
+Field	Residential example	Commercial example
+Sale Price	485000	2400000
+Commission Rate	6	4
+Property Specs	"4BR/3BA, 2,200 sqft, renovated kitchen..."	"45,000 SF industrial warehouse, 24ft clear height, 6 dock doors..."
+Offer Address	"142 Maple St — 3BR/2BA ranch, 90 days on market"	"4500 Commerce Pkwy — 28,000 SF industrial, 60 days on market"
+Follow-Up Situation	"Pre-approved for $420K... lease ends in 4 months"	"1031 exchange from a $2.1M sale, needs like-kind property within 45 days..."
+Open House Date	"Sat May 31, 1–4 PM"	"Tues Jun 10, 10 AM–12 PM (Broker Preview)"
+This was layered on top of what already existed (the Listing Description Features/Location swap from earlier still works the same way) — just extended the same pattern to every other shared field across the site.
+
+
+Index
+Code · HTML 
+
+
+
+
+
+Claude is AI and can make mistakes. Please double-check responses.
+
+
+Index · HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -165,21 +295,21 @@ footer span{color:var(--gold-dim);}
 </style>
 </head>
 <body>
-
+ 
 <header>
   <span class="crown">⚜️</span>
   <h1>Save Time Save Money</h1>
   <p class="subtitle">Full Arsenal Edition — 7 Power Tools for Elite Agents</p>
   <div class="divider"></div>
 </header>
-
+ 
 <div class="mode-toggle-wrap">
   <div class="mode-toggle" id="modeToggle">
     <button type="button" class="mode-btn active" data-mode="residential" onclick="setMode('residential')">🏡 Residential</button>
     <button type="button" class="mode-btn" data-mode="commercial" onclick="setMode('commercial')">🏢 Commercial</button>
   </div>
 </div>
-
+ 
 <div class="nav-wrap">
   <nav id="mainNav">
     <button class="active" id="navCommission" onclick="showPanel('commission',this)">💰 Commission</button>
@@ -191,9 +321,9 @@ footer span{color:var(--gold-dim);}
     <button id="navTimeline" onclick="showPanel('timeline',this)">📅 Deadlines</button>
   </nav>
 </div>
-
+ 
 <main>
-
+ 
 <!-- ══════════════════════════════════════════
      PANEL 1 — COMMISSION CALCULATOR
 ══════════════════════════════════════════ -->
@@ -201,13 +331,13 @@ footer span{color:var(--gold-dim);}
 <div class="card">
   <div class="card-title">👑 Commission Split &amp; Net Sheet Calculator</div>
   <div class="card-desc">Know your exact take-home on every deal before you hang up the phone. No more back-of-napkin math on closing day.</div>
-
+ 
   <label class="fl">Property Sale Price ($)</label>
   <input type="number" id="salePrice" placeholder="e.g. 485000" min="0" oninput="calcCommission()"/>
-
+ 
   <label class="fl">Total Commission Rate (%)</label>
   <input type="number" id="commRate" placeholder="e.g. 6" step="0.1" min="0" max="100" oninput="calcCommission()"/>
-
+ 
   <label class="fl">Commission Split — Listing Side (%)</label>
   <div class="row2">
     <div>
@@ -217,13 +347,13 @@ footer span{color:var(--gold-dim);}
       <input type="number" id="buySplit" placeholder="Buyer agent % (e.g. 50)" step="1" min="0" max="100" oninput="calcCommission()"/>
     </div>
   </div>
-
+ 
   <label class="fl">Your Agent-to-Broker Split (you keep %)</label>
   <input type="number" id="agentSplit" placeholder="e.g. 80" step="1" min="0" max="100" oninput="calcCommission()"/>
-
+ 
   <label class="fl">Transaction Fees &amp; Other Costs ($)</label>
   <input type="number" id="fees" placeholder="e.g. 350" min="0" oninput="calcCommission()"/>
-
+ 
   <div class="cre-only">
     <label class="fl">Property Type (Commercial)</label>
     <select id="commPropType">
@@ -234,10 +364,10 @@ footer span{color:var(--gold-dim);}
       <option value="Mixed-Use">Mixed-Use</option>
       <option value="Land">Land</option>
     </select>
-
+ 
     <label class="fl">Net Operating Income — Annual ($)</label>
     <input type="number" id="noi" placeholder="e.g. 145000" min="0" oninput="calcCommission()"/>
-
+ 
     <div class="row2">
       <div>
         <label class="fl">Down Payment ($)</label>
@@ -248,11 +378,11 @@ footer span{color:var(--gold-dim);}
         <input type="number" id="debtService" placeholder="e.g. 90000" min="0" oninput="calcCommission()"/>
       </div>
     </div>
-
+ 
     <label class="fl">Building Square Footage</label>
     <input type="number" id="commSqft" placeholder="e.g. 12000" min="0" oninput="calcCommission()"/>
   </div>
-
+ 
   <div class="stat-grid">
     <div class="stat-box"><div class="stat-lbl">Gross Commission</div><div class="stat-val big" id="grossComm">$0</div></div>
     <div class="stat-box"><div class="stat-lbl">Your Side Gross</div><div class="stat-val" id="yourSideGross">$0</div></div>
@@ -264,7 +394,7 @@ footer span{color:var(--gold-dim);}
   </div>
 </div>
 </div>
-
+ 
 <!-- ══════════════════════════════════════════
      PANEL 2 — MARKETING ENGINE
 ══════════════════════════════════════════ -->
@@ -272,22 +402,22 @@ footer span{color:var(--gold-dim);}
 <div class="card">
   <div class="card-title">📣 AI Marketing &amp; Strategy Engine</div>
   <div class="card-desc">Full specialist package: SEO and GEO strategy, market pitch, buyer ROI angle, and viral social script — all generated at once.</div>
-
+ 
   <label class="fl">Property Specs &amp; Key Assets</label>
   <textarea id="mktSpecs" placeholder="e.g. 4BR/3BA, 2,200 sqft, renovated kitchen, pool, corner lot, new roof 2023, 3-car garage..."></textarea>
-
+ 
   <label class="fl">Target Market / Neighborhood</label>
   <input type="text" id="mktNeighborhood" placeholder="e.g. Buckhead Atlanta, first-time buyers, luxury investors..."/>
-
+ 
   <label class="fl" id="mktPriceLabel">Listing Price</label>
   <input type="text" id="mktPrice" placeholder="e.g. $525,000"/>
-
+ 
   <button class="btn btn-gold" id="mktBtn" onclick="runMarketing()">⚡ Generate Full Strategy Package</button>
   <div class="lbox" id="mktLoading"><div class="spinner"></div><p>Crafting your specialist strategy...</p></div>
   <div id="mktResults"></div>
 </div>
 </div>
-
+ 
 <!-- ══════════════════════════════════════════
      PANEL 3 — OFFER & COUNTER-OFFER
 ══════════════════════════════════════════ -->
@@ -295,13 +425,13 @@ footer span{color:var(--gold-dim);}
 <div class="card">
   <div class="card-title">🤝 Offer &amp; Counter-Offer Generator <span class="badge-new">NEW</span></div>
   <div class="card-desc">Complete negotiation playbook + professional offer language in 30 seconds. Gives any agent the leverage of a 40-year veteran on every deal.</div>
-
+ 
   <label class="fl">You Are Representing</label>
   <select id="offerSide">
     <option value="buyer">The Buyer</option>
     <option value="seller">The Seller</option>
   </select>
-
+ 
   <div class="cre-only">
     <label class="fl">Deal Type</label>
     <select id="offerDealType">
@@ -309,7 +439,7 @@ footer span{color:var(--gold-dim);}
       <option value="lease">Lease</option>
     </select>
   </div>
-
+ 
   <div class="row2">
     <div>
       <label class="fl" id="offerAskLabel">Asking / List Price ($)</label>
@@ -320,7 +450,7 @@ footer span{color:var(--gold-dim);}
       <input type="number" id="offerPrice" placeholder="e.g. 472000" min="0"/>
     </div>
   </div>
-
+ 
   <div class="row2 cre-only">
     <div>
       <label class="fl">Base Rent ($/SF/Yr) — if lease</label>
@@ -331,7 +461,7 @@ footer span{color:var(--gold-dim);}
       <input type="number" id="offerLeaseTerm" placeholder="e.g. 5" min="0"/>
     </div>
   </div>
-
+ 
   <div class="row2 cre-only">
     <div>
       <label class="fl">CAM Charges ($/SF/Yr) — if lease</label>
@@ -342,13 +472,13 @@ footer span{color:var(--gold-dim);}
       <input type="text" id="offerTI" placeholder="e.g. $15/SF"/>
     </div>
   </div>
-
+ 
   <label class="fl">Property Address / Description</label>
   <input type="text" id="offerAddr" placeholder="e.g. 142 Maple St — 3BR/2BA ranch, 90 days on market"/>
-
+ 
   <label class="fl">Days on Market</label>
   <input type="number" id="offerDOM" placeholder="e.g. 47" min="0"/>
-
+ 
   <div class="res-only">
     <label class="fl">Contingencies</label>
     <div class="row3" style="margin-top:8px;">
@@ -357,7 +487,7 @@ footer span{color:var(--gold-dim);}
       <label class="ck-label"><input type="checkbox" id="contAppraisal" checked/> Appraisal</label>
     </div>
   </div>
-
+ 
   <div class="cre-only">
     <label class="fl">Contingencies</label>
     <div class="row3" style="margin-top:8px;">
@@ -366,7 +496,7 @@ footer span{color:var(--gold-dim);}
       <label class="ck-label"><input type="checkbox" id="contEnviro" checked/> Environmental / Zoning</label>
     </div>
   </div>
-
+ 
   <label class="fl">Seller Motivation Level</label>
   <select id="offerMotivation">
     <option value="unknown">Unknown — Not sure</option>
@@ -375,19 +505,19 @@ footer span{color:var(--gold-dim);}
     <option value="high">High — Needs to close fast</option>
     <option value="distressed">Distressed — Pre-foreclosure / divorce / estate</option>
   </select>
-
+ 
   <label class="fl">Closing Timeline</label>
   <input type="text" id="offerClose" placeholder="e.g. 30 days, 45 days, flexible"/>
-
+ 
   <label class="fl">Special Terms or Concessions</label>
   <textarea id="offerTerms" style="min-height:72px" placeholder="e.g. seller pays closing costs, include appliances, leaseback 30 days, as-is..."></textarea>
-
+ 
   <button class="btn btn-gold" id="offerBtn" onclick="runOffer()">⚔️ Generate Negotiation Strategy + Offer Language</button>
   <div class="lbox" id="offerLoading"><div class="spinner"></div><p>Building your negotiation playbook...</p></div>
   <div id="offerResults"></div>
 </div>
 </div>
-
+ 
 <!-- ══════════════════════════════════════════
      PANEL 4 — FOLLOW-UP EMAIL SEQUENCE
 ══════════════════════════════════════════ -->
@@ -395,7 +525,7 @@ footer span{color:var(--gold-dim);}
 <div class="card">
   <div class="card-title">📧 Client Follow-Up Email Sequence <span class="badge-new">NEW</span></div>
   <div class="card-desc">Stop losing deals to silence. Get a personalized 5-email drip sequence for any lead type — ready for your CRM in 60 seconds.</div>
-
+ 
   <div class="res-only">
     <label class="fl">Lead Type</label>
     <select id="fuLeadType">
@@ -409,7 +539,7 @@ footer span{color:var(--gold-dim);}
       <option value="cold_lead">Cold Lead (30+ days no contact)</option>
     </select>
   </div>
-
+ 
   <div class="cre-only">
     <label class="fl">Lead Type</label>
     <select id="fuLeadTypeCRE">
@@ -421,16 +551,16 @@ footer span{color:var(--gold-dim);}
       <option value="cold_lead">Cold Lead (30+ days no contact)</option>
     </select>
   </div>
-
+ 
   <label class="fl">Client Name(s)</label>
   <input type="text" id="fuName" placeholder="e.g. Marcus &amp; Tanya"/>
-
+ 
   <label class="fl">Their Situation (more detail = better emails)</label>
   <textarea id="fuSituation" placeholder="e.g. Pre-approved for $420K, looking in Midtown, saw 3 homes last week, price is main concern, lease ends in 4 months..."></textarea>
-
+ 
   <label class="fl">Your Name &amp; Brokerage</label>
   <input type="text" id="fuAgent" placeholder="e.g. Keisha Williams, KW Metro"/>
-
+ 
   <label class="fl">Sequence Tone</label>
   <select id="fuTone">
     <option value="warm professional">Warm &amp; Professional</option>
@@ -438,10 +568,10 @@ footer span{color:var(--gold-dim);}
     <option value="consultative advisor">Consultative / Advisor</option>
     <option value="casual and friendly">Casual &amp; Friendly</option>
   </select>
-
+ 
   <button class="btn btn-gold" id="fuBtn" onclick="runFollowUp()">✉️ Generate 5-Email Drip Sequence</button>
   <div class="lbox" id="fuLoading"><div class="spinner"></div><p>Writing your personalized sequence...</p></div>
-
+ 
   <div id="fuResults" style="display:none;">
     <div class="email-tabs" id="emailTabs"></div>
     <div class="email-box">
@@ -454,7 +584,7 @@ footer span{color:var(--gold-dim);}
   </div>
 </div>
 </div>
-
+ 
 <!-- ══════════════════════════════════════════
      PANEL 5 — LISTING DESCRIPTION
 ══════════════════════════════════════════ -->
@@ -462,7 +592,7 @@ footer span{color:var(--gold-dim);}
 <div class="card">
   <div class="card-title">🏠 Listing Description Generator <span class="badge-new">NEW</span></div>
   <div class="card-desc">MLS-optimized listing copy with SEO and GEO scoring. Turn 60 seconds of input into a description that stops scrollers and pulls the right buyer in.</div>
-
+ 
   <div class="row2 res-only">
     <div>
       <label class="fl">Beds / Baths</label>
@@ -473,7 +603,7 @@ footer span{color:var(--gold-dim);}
       <input type="number" id="ldSqft" placeholder="e.g. 2450" min="0"/>
     </div>
   </div>
-
+ 
   <div class="row2 cre-only">
     <div>
       <label class="fl">Building Class</label>
@@ -488,7 +618,7 @@ footer span{color:var(--gold-dim);}
       <input type="number" id="ldSqftCRE" placeholder="e.g. 18000" min="0"/>
     </div>
   </div>
-
+ 
   <div class="res-only">
     <label class="fl">Property Type</label>
     <select id="ldType">
@@ -500,7 +630,7 @@ footer span{color:var(--gold-dim);}
       <option value="Commercial Property">Commercial Property</option>
     </select>
   </div>
-
+ 
   <div class="cre-only">
     <label class="fl">Property Type</label>
     <select id="ldTypeCRE">
@@ -513,13 +643,13 @@ footer span{color:var(--gold-dim);}
       <option value="Land">Land</option>
     </select>
   </div>
-
+ 
   <label class="fl" id="ldFeaturesLabel">Top Features &amp; Upgrades (list everything)</label>
   <textarea id="ldFeatures" placeholder="e.g. Renovated chef's kitchen, quartz counters, SS appliances, primary suite with spa bath, 3-car garage, resort-style pool, smart home, corner lot, new HVAC 2023, hardwood floors throughout..."></textarea>
-
+ 
   <label class="fl" id="ldLocationLabel">Neighborhood &amp; Location Selling Points</label>
   <input type="text" id="ldLocation" placeholder="e.g. Top-rated schools, walk to downtown, 5 min from I-285, gated community..."/>
-
+ 
   <div class="res-only">
     <label class="fl">Target Buyer</label>
     <select id="ldBuyer">
@@ -531,7 +661,7 @@ footer span{color:var(--gold-dim);}
       <option value="First-Time Buyers">First-Time Buyers</option>
     </select>
   </div>
-
+ 
   <div class="cre-only">
     <label class="fl">Target Buyer</label>
     <select id="ldBuyerCRE">
@@ -542,10 +672,10 @@ footer span{color:var(--gold-dim);}
       <option value="Institutional / REIT">Institutional / REIT</option>
     </select>
   </div>
-
+ 
   <label class="fl">Listing Price</label>
   <input type="text" id="ldPrice" placeholder="e.g. $649,000"/>
-
+ 
   <div class="row2 cre-only">
     <div>
       <label class="fl">Lease Rate ($/SF/Year) — optional</label>
@@ -560,13 +690,13 @@ footer span{color:var(--gold-dim);}
       </select>
     </div>
   </div>
-
+ 
   <button class="btn btn-gold" id="ldBtn" onclick="runListing()">✍️ Generate MLS Listing + SEO & GEO Score</button>
   <div class="lbox" id="ldLoading"><div class="spinner"></div><p>Crafting your listing masterpiece...</p></div>
   <div id="ldResults"></div>
 </div>
 </div>
-
+ 
 <!-- ══════════════════════════════════════════
      PANEL 6 — OPEN HOUSE PLAYBOOK
 ══════════════════════════════════════════ -->
@@ -574,13 +704,13 @@ footer span{color:var(--gold-dim);}
 <div class="card">
   <div class="card-title" id="ohCardTitle">🗝️ Open House ROI &amp; Script Builder <span class="badge-new">NEW</span></div>
   <div class="card-desc" id="ohCardDesc">Stop winging it. Get a budget breakdown, word-for-word agent script, lead qualification questions, and post-visit follow-up emails — before you arrive at the door.</div>
-
+ 
   <label class="fl" id="ohAddrLabel">Property Address &amp; Type</label>
   <input type="text" id="ohAddr" placeholder="e.g. 318 Oak Blvd — 4BR colonial, $549K, Roswell GA"/>
-
+ 
   <label class="fl" id="ohHighlightsLabel">Top 5 Property Highlights</label>
   <textarea id="ohHighlights" style="min-height:72px" placeholder="e.g. Just renovated, new roof, best school district in county, huge backyard, priced $30K below comps..."></textarea>
-
+ 
   <div class="row2">
     <div>
       <label class="fl" id="ohBudgetLabel">Open House Budget ($)</label>
@@ -591,7 +721,7 @@ footer span{color:var(--gold-dim);}
       <input type="text" id="ohDate" placeholder="e.g. Sat May 31, 1–4 PM"/>
     </div>
   </div>
-
+ 
   <div class="res-only">
     <label class="fl">Expected Visitor Mix</label>
     <select id="ohVisitor">
@@ -601,7 +731,7 @@ footer span{color:var(--gold-dim);}
       <option value="investment-focused buyers">Investment-Focused Buyers</option>
     </select>
   </div>
-
+ 
   <div class="cre-only">
     <label class="fl">Expected Attendee Type</label>
     <select id="ohVisitorCRE">
@@ -611,13 +741,13 @@ footer span{color:var(--gold-dim);}
       <option value="developers and brokers on a broker preview tour">Developers &amp; Brokers (Broker Preview)</option>
     </select>
   </div>
-
+ 
   <button class="btn btn-gold" id="ohBtn" onclick="runOpenHouse()">🏡 Generate Open House Playbook</button>
   <div class="lbox" id="ohLoading"><div class="spinner"></div><p>Building your open house playbook...</p></div>
   <div id="ohResults"></div>
 </div>
 </div>
-
+ 
 <!-- ══════════════════════════════════════════
      PANEL 7 — TRANSACTION DEADLINE TRACKER
 ══════════════════════════════════════════ -->
@@ -625,7 +755,7 @@ footer span{color:var(--gold-dim);}
 <div class="card">
   <div class="card-title">📅 Transaction Deadline Tracker <span class="badge-new">NEW</span></div>
   <div class="card-desc">One missed deadline can kill your deal and cost you your license. Enter your dates — get every critical milestone color-coded with buffer alerts.</div>
-
+ 
   <div class="row2">
     <div>
       <label class="fl">Contract Acceptance Date</label>
@@ -636,7 +766,7 @@ footer span{color:var(--gold-dim);}
       <input type="date" id="tlClose"/>
     </div>
   </div>
-
+ 
   <div class="res-only">
     <label class="fl">Loan / Transaction Type</label>
     <select id="tlType">
@@ -647,7 +777,7 @@ footer span{color:var(--gold-dim);}
       <option value="jumbo">Jumbo / Non-Conforming</option>
     </select>
   </div>
-
+ 
   <div class="cre-only">
     <label class="fl">Loan / Transaction Type</label>
     <select id="tlTypeCRE">
@@ -659,10 +789,10 @@ footer span{color:var(--gold-dim);}
       <option value="cash">All Cash</option>
     </select>
   </div>
-
+ 
   <label class="fl">State (affects timelines)</label>
   <input type="text" id="tlState" placeholder="e.g. Georgia, Texas, Florida..."/>
-
+ 
   <div class="res-only">
     <label class="fl" style="margin-bottom:10px;">Special Conditions</label>
     <div class="row2">
@@ -670,7 +800,7 @@ footer span{color:var(--gold-dim);}
       <label class="ck-label"><input type="checkbox" id="tlSeptic"/> Septic Inspection Needed</label>
     </div>
   </div>
-
+ 
   <div class="cre-only">
     <label class="fl" style="margin-bottom:10px;">Special Conditions</label>
     <div class="row2">
@@ -681,26 +811,26 @@ footer span{color:var(--gold-dim);}
       <label class="ck-label"><input type="checkbox" id="tlEstoppel" checked/> Tenant Estoppel Certificates</label>
     </div>
   </div>
-
+ 
   <button class="btn btn-gold" onclick="runTimeline()">📋 Generate Full Deadline Timeline</button>
-
+ 
   <div id="tlOutput" style="display:none;">
     <div class="dl-list" id="deadlineList"></div>
     <div class="warn-box" style="margin-top:14px;">⚠️ <strong>Always verify</strong> these deadlines with your broker and title company. State laws and contract addenda can override standard timelines. All dates include a 1-day buffer.</div>
   </div>
-
+ 
   <div class="lbox" id="tlLoading"><div class="spinner"></div><p>Generating expert tips for your transaction...</p></div>
   <div id="tlAIResults"></div>
 </div>
 </div>
-
+ 
 </main>
 <footer>THE DEAL CLOSER AI &nbsp;|&nbsp; <span>Full Arsenal Edition</span> &nbsp;|&nbsp; Powered by Claude AI</footer>
 <div id="toast">✅ Copied!</div>
-
+ 
 <script>
 'use strict';
-
+ 
 /* ═══════════════════════════════
    NAVIGATION
 ═══════════════════════════════ */
@@ -711,7 +841,7 @@ function showPanel(id, btn) {
   btn.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
+ 
 /* ═══════════════════════════════
    TOAST / COPY
 ═══════════════════════════════ */
@@ -738,7 +868,7 @@ function fallbackCopy(txt) {
   try { document.execCommand('copy'); showToast(); } catch(e) { alert('Copy failed — please select text manually.'); }
   document.body.removeChild(ta);
 }
-
+ 
 /* ═══════════════════════════════
    UI HELPERS
 ═══════════════════════════════ */
@@ -749,17 +879,17 @@ function enableBtn(id)   { var el = document.getElementById(id); if(el) el.disab
 function clearEl(id)     { document.getElementById(id).innerHTML = ''; }
 function showEl(id)      { document.getElementById(id).style.display = 'block'; }
 function hideEl(id)      { document.getElementById(id).style.display = 'none'; }
-
+ 
 function showError(containerId, msg) {
   document.getElementById(containerId).innerHTML =
     '<div class="err-box">&#10060; ' + escHTML(msg) + '<br><small style="opacity:.7">Check your connection and try again.</small></div>';
 }
-
+ 
 function escHTML(str) {
   return String(str || '')
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
+ 
 /* ═══════════════════════════════
    SECTION CARD BUILDER
    Uses a closure-based store so
@@ -767,7 +897,7 @@ function escHTML(str) {
 ═══════════════════════════════ */
 var _store = {};
 var _storeIdx = 0;
-
+ 
 function makeSection(title, content) {
   var key = 'k' + (++_storeIdx);
   var safeContent = content && content.trim() ? content.trim() : '(This section had no content — try regenerating.)';
@@ -778,14 +908,14 @@ function makeSection(title, content) {
     '<div class="sr-body">' + escHTML(safeContent) + '</div>' +
     '</div>';
 }
-
+ 
 /* ═══════════════════════════════
    AI API  (OpenAI-compatible, CORS-enabled)
 ═══════════════════════════════ */
 var _AI_BASE = 'https://api.manus.im/api/llm-proxy/v1';
 var _AI_KEY  = 'sk-Kdc58KKRTPCFeJyiAdqqJN';
 var _AI_MODEL = 'gemini-2.5-flash';
-
+ 
 async function callClaude(systemPrompt, userPrompt, maxTokens) {
   var tokens = maxTokens || 1800;
   var res = await fetch(_AI_BASE + '/chat/completions', {
@@ -813,7 +943,7 @@ async function callClaude(systemPrompt, userPrompt, maxTokens) {
   if (!data.choices || !data.choices.length) throw new Error('No content returned from API.');
   return data.choices[0].message.content || '';
 }
-
+ 
 /* ═══════════════════════════════
    SECTION EXTRACTOR
    Robust — handles both
@@ -833,17 +963,17 @@ function extractSection(text, label) {
   if (m && m[1].trim()) return m[1].trim();
   return '';
 }
-
+ 
 /* ═══════════════════════════════════════════════════════
    RESIDENTIAL / COMMERCIAL MODE TOGGLE (added)
 ═══════════════════════════════════════════════════════ */
 function setMode(mode) {
   document.body.classList.toggle('mode-commercial', mode === 'commercial');
-
+ 
   document.querySelectorAll('.mode-btn').forEach(function(b){
     b.classList.toggle('active', b.dataset.mode === mode);
   });
-
+ 
   var navLabels = mode === 'commercial'
     ? {
         navCommission: '💰 Commission &amp; Cap Rate',
@@ -867,14 +997,14 @@ function setMode(mode) {
     var el = document.getElementById(id);
     if (el) el.innerHTML = navLabels[id];
   });
-
+ 
   document.querySelectorAll('.cre-only').forEach(function(el){
     el.style.display = (mode === 'commercial') ? '' : 'none';
   });
   document.querySelectorAll('.res-only').forEach(function(el){
     el.style.display = (mode === 'commercial') ? 'none' : '';
   });
-
+ 
   var featLabel = document.getElementById('ldFeaturesLabel');
   var featEl    = document.getElementById('ldFeatures');
   var locLabel  = document.getElementById('ldLocationLabel');
@@ -892,7 +1022,7 @@ function setMode(mode) {
       locEl.placeholder = 'e.g. Top-rated schools, walk to downtown, 5 min from I-285, gated community...';
     }
   }
-
+ 
   var ohTitle = document.getElementById('ohCardTitle');
   var ohDesc  = document.getElementById('ohCardDesc');
   var ohAddrLbl = document.getElementById('ohAddrLabel');
@@ -913,7 +1043,7 @@ function setMode(mode) {
       if (ohBudgetLbl) ohBudgetLbl.textContent = 'Open House Budget ($)';
     }
   }
-
+ 
   var placeholderSwap = {
     salePrice:      { res: 'e.g. 485000',                     cre: 'e.g. 2400000' },
     commRate:       { res: 'e.g. 6',                          cre: 'e.g. 4' },
@@ -938,19 +1068,19 @@ function setMode(mode) {
     var el = document.getElementById(id);
     if (el) el.placeholder = mode === 'commercial' ? placeholderSwap[id].cre : placeholderSwap[id].res;
   });
-
+ 
   if (typeof calcCommission === 'function') calcCommission();
-
+ 
   try { localStorage.setItem('creMode', mode); } catch(e){}
 }
-
+ 
 (function(){
   var saved = 'residential';
   try { saved = localStorage.getItem('creMode') || 'residential'; } catch(e){}
   document.addEventListener('DOMContentLoaded', function(){ setMode(saved); });
   if (document.readyState === 'complete' || document.readyState === 'interactive') setMode(saved);
 })();
-
+ 
 /* ═══════════════════════════════════════════════════════
    TOOL 1 — COMMISSION CALCULATOR (real-time, no API)
 ═══════════════════════════════════════════════════════ */
@@ -969,12 +1099,12 @@ function calcCommission() {
   document.getElementById('yourSideGross').textContent = fmt(yourGross);
   document.getElementById('afterBroker').textContent   = fmt(afterBkr);
   document.getElementById('netTakeHome').textContent   = fmt(net);
-
+ 
   var noiEl = document.getElementById('noi');
   var noi = noiEl ? (parseFloat(noiEl.value) || 0) : 0;
   var capRateEl = document.getElementById('capRate');
   if (capRateEl) capRateEl.textContent = (price > 0 ? (noi / price * 100) : 0).toFixed(2) + '%';
-
+ 
   var down = parseFloat((document.getElementById('downPayment')||{}).value) || 0;
   var debt = parseFloat((document.getElementById('debtService')||{}).value) || 0;
   var cocEl = document.getElementById('cashOnCash');
@@ -982,12 +1112,12 @@ function calcCommission() {
     var annualCashFlow = noi - debt;
     cocEl.textContent = (down > 0 ? (annualCashFlow / down * 100) : 0).toFixed(2) + '%';
   }
-
+ 
   var sqft = parseFloat((document.getElementById('commSqft')||{}).value) || 0;
   var psfEl = document.getElementById('pricePerSF');
   if (psfEl) psfEl.textContent = fmt(sqft > 0 ? (price / sqft) : 0);
 }
-
+ 
 /* ═══════════════════════════════════════════════════════
    TOOL 2 — AI MARKETING ENGINE
 ═══════════════════════════════════════════════════════ */
@@ -997,16 +1127,16 @@ async function runMarketing() {
   var nbhd  = document.getElementById('mktNeighborhood').value.trim();
   var price = document.getElementById('mktPrice').value.trim();
   if (!specs) { alert('Please enter the property specs first.'); return; }
-
+ 
   disableBtn('mktBtn');
   showLoading('mktLoading');
   clearEl('mktResults');
-
+ 
   var system, prompt;
-
+ 
   if (mode === 'commercial') {
     system = 'You are a highly gifted commercial real estate marketing genius with 40 years of experience and over $2 billion in CRE transactions. You have mastered investor marketing, broker network distribution, and positioning deals for cap-rate buyers, developers, and institutional capital. Respond in plain text only. Do not use markdown, asterisks, pound signs, or bullet hyphens.';
-
+ 
     prompt = 'Property: ' + specs + '\n' +
       'Trade Area / Target Market: ' + (nbhd || 'not specified') + '\n' +
       'Price: ' + (price || 'not specified') + '\n\n' +
@@ -1021,7 +1151,7 @@ async function runMarketing() {
       'Write a complete script for reaching out to a broker network and investor database about this listing — for email or a short video. Strong hook with the key number, compelling middle, clear call to action to request the OM or schedule a tour.';
   } else {
     system = 'You are a highly gifted real estate marketing genius with 40 years of experience and over $2 billion in sales. You have mastered SEO and GEO social media, luxury positioning, and buyer psychology. Respond in plain text only. Do not use markdown, asterisks, pound signs, or bullet hyphens.';
-
+ 
     prompt = 'Property: ' + specs + '\n' +
       'Neighborhood/Target Market: ' + (nbhd || 'not specified') + '\n' +
       'Listing Price: ' + (price || 'not specified') + '\n\n' +
@@ -1035,7 +1165,7 @@ async function runMarketing() {
       '[TIKTOK REEL SCRIPT]\n' +
       'Write a complete 30-second TikTok/Instagram Reel script with a strong hook, compelling middle, and call to action. Include relevant emojis. Make it viral-worthy.';
   }
-
+ 
   try {
     var raw = await callClaude(system, prompt, 1800);
     var s1 = extractSection(raw, mode === 'commercial' ? 'SEO STRATEGY' : 'SEO STRATEGY');
@@ -1050,11 +1180,11 @@ async function runMarketing() {
   } catch(e) {
     showError('mktResults', e.message);
   }
-
+ 
   hideLoading('mktLoading');
   enableBtn('mktBtn');
 }
-
+ 
 /* ═══════════════════════════════════════════════════════
    TOOL 3 — OFFER & COUNTER-OFFER GENERATOR
 ═══════════════════════════════════════════════════════ */
@@ -1063,7 +1193,7 @@ async function runOffer() {
   var askRaw = document.getElementById('offerAsk').value.trim();
   var offRaw = document.getElementById('offerPrice').value.trim();
   if (!askRaw || !offRaw) { alert('Please enter both the asking price and the offer/counter price.'); return; }
-
+ 
   var side  = document.getElementById('offerSide').value;
   var ask   = parseFloat(askRaw);
   var ofr   = parseFloat(offRaw);
@@ -1072,22 +1202,22 @@ async function runOffer() {
   var motiv = document.getElementById('offerMotivation').value;
   var close = document.getElementById('offerClose').value.trim() || 'standard timeline';
   var terms = document.getElementById('offerTerms').value.trim() || 'none';
-
+ 
   var contingencyStr, dealDetails = '';
-
+ 
   if (mode === 'commercial') {
     var conts = [];
     if (document.getElementById('contDueDiligence').checked) conts.push('Due Diligence');
     if (document.getElementById('contFinanceCRE').checked)   conts.push('Financing');
     if (document.getElementById('contEnviro').checked)       conts.push('Environmental / Zoning');
     contingencyStr = conts.length ? conts.join(', ') : 'No contingencies';
-
+ 
     var dealType  = document.getElementById('offerDealType').value;
     var baseRent  = document.getElementById('offerBaseRent').value.trim();
     var leaseTerm = document.getElementById('offerLeaseTerm').value.trim();
     var cam       = document.getElementById('offerCAM').value.trim();
     var ti        = document.getElementById('offerTI').value.trim();
-
+ 
     dealDetails = 'Deal Type: ' + dealType + '\n';
     if (dealType === 'lease') {
       dealDetails += (baseRent  ? 'Base Rent: ' + baseRent + '\n' : '') +
@@ -1102,18 +1232,18 @@ async function runOffer() {
     if (document.getElementById('contAppraisal').checked) conts.push('Appraisal');
     contingencyStr = conts.length ? conts.join(', ') : 'No contingencies';
   }
-
+ 
   var diffPct = ask > 0 ? Math.abs(((ask - ofr) / ask) * 100).toFixed(1) : '0';
   var diffDir = ofr < ask ? 'below asking' : (ofr > ask ? 'above asking' : 'at asking');
-
+ 
   disableBtn('offerBtn');
   showLoading('offerLoading');
   clearEl('offerResults');
-
+ 
   var system = mode === 'commercial'
     ? 'You are a highly gifted master genius commercial real estate negotiator with 40 years of experience and over 3,000 closed CRE transactions across office, retail, industrial, and multifamily. You understand cap rate negotiation, lease economics, and how institutional and private capital think about deal terms. Respond in plain text only. No markdown, no asterisks, no pound signs.'
     : 'You are a highly gifted master genius real estate negotiator with 40 years of experience and over 3,000 closed transactions. You know every psychological and tactical lever in a real estate deal. You have coached hundreds of agents on negotiation. Respond in plain text only. No markdown, no asterisks, no pound signs.';
-
+ 
   var prompt = 'I am representing the ' + side + '.\n' +
     'Property: ' + addr + '\n' +
     dealDetails +
@@ -1133,7 +1263,7 @@ async function runOffer() {
     'Write 3 likely objections the other side will raise, each followed by my exact scripted response. Sharp, confident, and professional.\n\n' +
     '[WALK AWAY POINT]\n' +
     'Tell me exactly where my client\'s walk-away point should be and why, given all the facts above. Be specific with numbers.';
-
+ 
   try {
     var raw = await callClaude(system, prompt, 2000);
     var s1 = extractSection(raw, 'NEGOTIATION STRATEGY');
@@ -1148,16 +1278,16 @@ async function runOffer() {
   } catch(e) {
     showError('offerResults', e.message);
   }
-
+ 
   hideLoading('offerLoading');
   enableBtn('offerBtn');
 }
-
+ 
 /* ═══════════════════════════════════════════════════════
    TOOL 4 — FOLLOW-UP EMAIL SEQUENCE
 ═══════════════════════════════════════════════════════ */
 var _emails = [];
-
+ 
 async function runFollowUp() {
   var mode = document.body.classList.contains('mode-commercial') ? 'commercial' : 'residential';
   var leadType  = mode === 'commercial' ? document.getElementById('fuLeadTypeCRE').value : document.getElementById('fuLeadType').value;
@@ -1165,16 +1295,16 @@ async function runFollowUp() {
   var situation = document.getElementById('fuSituation').value.trim() || 'interested buyer or seller, details not provided';
   var agentName = document.getElementById('fuAgent').value.trim()     || 'Your Agent';
   var tone      = document.getElementById('fuTone').value;
-
+ 
   disableBtn('fuBtn');
   showLoading('fuLoading');
   hideEl('fuResults');
   _emails = [];
-
+ 
   var system = mode === 'commercial'
     ? 'You are a highly gifted master genius commercial real estate broker with 40 years of experience and deep mastery of investor and tenant psychology. You write emails that feel genuinely personal, never templated, and speak fluently about deal terms, cap rates, and timelines. Your sequences convert leads at 3x the industry average. Respond in plain text only. No markdown, no asterisks, no pound signs.'
     : 'You are a highly gifted master genius real estate agent with 40 years of experience and deep mastery of client psychology. You write emails that feel genuinely personal, never templated. Your sequences convert leads at 3x the industry average. Respond in plain text only. No markdown, no asterisks, no pound signs.';
-
+ 
   // Use numbered delimiters that are highly reliable to parse
   var prompt = 'Client name: ' + clientName + '\n' +
     'Lead type: ' + leadType.replace(/_/g, ' ') + '\n' +
@@ -1197,7 +1327,7 @@ async function runFollowUp() {
     'Email 4: Soft urgency — a real market condition or opportunity they might miss\n' +
     'Email 5: Final clean check-in — no pressure, keeps the door open professionally\n\n' +
     'Each email: 120-180 words. Make every email feel like a real human wrote it specifically for this client. No generic filler.';
-
+ 
   try {
     var raw = await callClaude(system, prompt, 2400);
     // Parse with reliable delimiters
@@ -1226,11 +1356,11 @@ async function runFollowUp() {
     document.getElementById('fuBtn').parentNode.insertAdjacentHTML('beforeend',
       '<div class="err-box">&#10060; ' + escHTML(e.message) + '</div>');
   }
-
+ 
   hideLoading('fuLoading');
   enableBtn('fuBtn');
 }
-
+ 
 function renderEmailTab(idx) {
   if (!_emails.length) return;
   idx = Math.min(Math.max(parseInt(idx, 10), 0), _emails.length - 1);
@@ -1245,12 +1375,12 @@ function renderEmailTab(idx) {
   // Body
   document.getElementById('emailBody').textContent = 'Subject: ' + e.subject + '\n\n' + e.body;
 }
-
+ 
 function copyActiveEmail() {
   var body = document.getElementById('emailBody').textContent;
   copyText(body);
 }
-
+ 
 /* ═══════════════════════════════════════════════════════
    TOOL 5 — LISTING DESCRIPTION GENERATOR
 ═══════════════════════════════════════════════════════ */
@@ -1258,16 +1388,16 @@ async function runListing() {
   var mode = document.body.classList.contains('mode-commercial') ? 'commercial' : 'residential';
   var features = document.getElementById('ldFeatures').value.trim();
   if (!features) { alert('Please enter the property ' + (mode === 'commercial' ? 'specs' : 'features') + '.'); return; }
-
+ 
   var location = document.getElementById('ldLocation').value.trim() || (mode === 'commercial' ? 'strong trade area' : 'desirable neighborhood');
   var listPrice= document.getElementById('ldPrice').value.trim()  || 'priced competitively';
-
+ 
   disableBtn('ldBtn');
   showLoading('ldLoading');
   clearEl('ldResults');
-
+ 
   var system, prompt;
-
+ 
   if (mode === 'commercial') {
     var buildingClass = document.getElementById('ldBuildingClass').value;
     var sqftCRE  = document.getElementById('ldSqftCRE').value.trim();
@@ -1275,9 +1405,9 @@ async function runListing() {
     var buyer    = document.getElementById('ldBuyerCRE').value;
     var leaseRate= document.getElementById('ldLeaseRate').value.trim();
     var leaseType= document.getElementById('ldLeaseType').value;
-
+ 
     system = 'You are a highly gifted master genius commercial real estate copywriter with 40 years of experience representing office, retail, industrial, and multifamily properties. Your listing descriptions are written for investors, brokers, and acquisitions teams — you lead with hard numbers (cap rate, NOI, price per square foot) and technical building specifications, not emotional buyer language. Respond in plain text only. No markdown, no asterisks, no pound signs.';
-
+ 
     prompt = 'Property details:\n' +
       'Building Class: ' + buildingClass + '\n' +
       'Total/Leasable Sq Ft: ' + (sqftCRE ? sqftCRE + ' SF' : 'not specified') + '\n' +
@@ -1301,9 +1431,9 @@ async function runListing() {
     var sqft     = document.getElementById('ldSqft').value.trim();
     var propType2= document.getElementById('ldType').value;
     var buyer2   = document.getElementById('ldBuyer').value;
-
+ 
     system = 'You are a highly gifted master genius real estate copywriter with 40 years of experience. Your listing descriptions consistently sell homes faster and above asking price. You understand buyer psychology, SEO and GEO optimization for property platforms, and how to create emotional urgency in copy. Respond in plain text only. No markdown, no asterisks, no pound signs.';
-
+ 
     prompt = 'Property details:\n' +
       'Beds/Baths: ' + bedBath + '\n' +
       'Square Footage: ' + (sqft ? sqft + ' sqft' : 'not specified') + '\n' +
@@ -1322,7 +1452,7 @@ async function runListing() {
       '[SEO SCORE]\n' +
       'Rate this listing description\'s SEO strength from 1 to 10. List the top 5 keywords naturally embedded in the description. Explain specifically what would push the score higher.';
   }
-
+ 
   try {
     var raw = await callClaude(system, prompt, 2000);
     var s1 = extractSection(raw, 'MLS DESCRIPTION');
@@ -1337,11 +1467,11 @@ async function runListing() {
   } catch(e) {
     showError('ldResults', e.message);
   }
-
+ 
   hideLoading('ldLoading');
   enableBtn('ldBtn');
 }
-
+ 
 /* ═══════════════════════════════════════════════════════
    TOOL 6 — OPEN HOUSE PLAYBOOK
 ═══════════════════════════════════════════════════════ */
@@ -1349,21 +1479,21 @@ async function runOpenHouse() {
   var mode = document.body.classList.contains('mode-commercial') ? 'commercial' : 'residential';
   var addr = document.getElementById('ohAddr').value.trim();
   if (!addr) { alert('Please enter the property address.'); return; }
-
+ 
   var highlights = document.getElementById('ohHighlights').value.trim() || (mode === 'commercial' ? 'strong asset in a growing trade area' : 'great home in a desirable area');
   var budget     = document.getElementById('ohBudget').value.trim()     || '300';
   var visitor    = mode === 'commercial' ? document.getElementById('ohVisitorCRE').value : document.getElementById('ohVisitor').value;
   var dateTime   = document.getElementById('ohDate').value.trim()       || 'this weekend';
-
+ 
   disableBtn('ohBtn');
   showLoading('ohLoading');
   clearEl('ohResults');
-
+ 
   var system, prompt;
-
+ 
   if (mode === 'commercial') {
     system = 'You are a highly gifted elite genius commercial real estate broker with 40 years of experience specializing in property tours and broker preview events for office, retail, industrial, and multifamily assets. You know instantly how to read institutional investors and developers, qualify serious capital, and convert broker previews into offers. Respond in plain text only. No markdown, no asterisks, no pound signs.';
-
+ 
     prompt = 'Property: ' + addr + '\n' +
       'Key Investment Highlights: ' + highlights + '\n' +
       'Budget: $' + budget + '\n' +
@@ -1384,7 +1514,7 @@ async function runOpenHouse() {
       'Each template should be 80-100 words, ready to copy-paste.';
   } else {
     system = 'You are an 1% highly gifted elite genius real estate agent with 40 years of experience specializing in open house strategy. You have hosted over 4,000 open houses and convert leads at 3x the national average. You know instantly how to read visitors, qualify serious buyers, and convert tire-kickers. Respond in plain text only. No markdown, no asterisks, no pound signs.';
-
+ 
     prompt = 'Property: ' + addr + '\n' +
       'Key Highlights: ' + highlights + '\n' +
       'Budget: $' + budget + '\n' +
@@ -1404,7 +1534,7 @@ async function runOpenHouse() {
       'Template C: For a Neighbor or Tire-Kicker — probably not buying but may refer someone\n' +
       'Each template should be 80-100 words, ready to copy-paste.';
   }
-
+ 
   try {
     var raw = await callClaude(system, prompt, 2200);
     var s1 = extractSection(raw, 'BUDGET BREAKDOWN');
@@ -1419,11 +1549,11 @@ async function runOpenHouse() {
   } catch(e) {
     showError('ohResults', e.message);
   }
-
+ 
   hideLoading('ohLoading');
   enableBtn('ohBtn');
 }
-
+ 
 /* ═══════════════════════════════════════════════════════
    TOOL 7 — TRANSACTION DEADLINE TRACKER
 ═══════════════════════════════════════════════════════ */
@@ -1438,17 +1568,17 @@ function runTimeline() {
   var enviro      = mode === 'commercial' && document.getElementById('tlEnviro').checked;
   var zoning      = mode === 'commercial' && document.getElementById('tlZoning').checked;
   var estoppel    = mode === 'commercial' && document.getElementById('tlEstoppel').checked;
-
+ 
   if (!contractVal) { alert('Please enter the contract acceptance date.'); return; }
   if (!closeVal)    { alert('Please enter the target closing date.'); return; }
-
+ 
   var contract  = new Date(contractVal + 'T12:00:00');
   var closing   = new Date(closeVal    + 'T12:00:00');
   var totalDays = Math.round((closing - contract) / 86400000);
-
+ 
   if (totalDays <= 0) { alert('Closing date must be after the contract date.'); return; }
   if (totalDays > 365) { alert('Timeline seems too long (over 1 year). Please check your dates.'); return; }
-
+ 
   function addDays(base, n) {
     var d = new Date(base.getTime());
     d.setDate(d.getDate() + Math.min(n, totalDays));
@@ -1471,15 +1601,15 @@ function runTimeline() {
     if (diff === 1) return '1 day left ⚠️';
     return diff + ' days left';
   }
-
+ 
   var ms = [];
-
+ 
   if (mode === 'commercial') {
     var isCash    = loanType === 'cash';
     var ddDays    = Math.min(45, Math.round(totalDays * 0.35));
     var loanCommit= isCash ? 0 : Math.round(totalDays * 0.82);
     var titleDays = Math.round(totalDays * 0.45);
-
+ 
     ms.push({ label: '📋 Contract / PSA Executed',      date: contract,                    note: 'Day 0 — Start ALL clocks immediately.' });
     if (!isCash) {
       ms.push({ label: '📑 Loan Application Submitted', date: addDays(contract, 5),        note: 'CRE lenders need full financials — submit within a week of signing.' });
@@ -1510,7 +1640,7 @@ function runTimeline() {
     var apprDl    = isCash ? 0  : (isVA ? 25 : 21);
     var loanCommit= isCash ? 0  : Math.round(totalDays * 0.72);
     var titleDays = Math.round(totalDays * 0.42);
-
+ 
     ms.push({ label: '📋 Contract Acceptance',          date: contract,                     note: 'Day 0 — Start ALL clocks immediately.' });
     if (!isCash) {
       ms.push({ label: '📑 Loan Application Submitted', date: addDays(contract, 3),         note: 'Buyer must formally apply — do not let this drift past day 3.' });
@@ -1532,10 +1662,10 @@ function runTimeline() {
     ms.push({ label: '💰 Wire Funds / Cashier\'s Check', date: addDays(contract, totalDays - 1), note: 'Always verify wire instructions by phone — wire fraud is rampant.' });
     ms.push({ label: '🎉 CLOSING DAY',                   date: closing,                     note: 'The finish line — stay on schedule and celebrate your client!' });
   }
-
+ 
   // Sort by date
   ms.sort(function(a, b){ return a.date.getTime() - b.date.getTime(); });
-
+ 
   var html = ms.map(function(m){
     return '<div class="dl-item">' +
       '<div class="ddot ' + dotCls(m.date) + '"></div>' +
@@ -1543,22 +1673,22 @@ function runTimeline() {
       '<div class="dright"><div class="ddate">' + fmtDate(m.date) + '</div><div class="ddays">' + daysLbl(m.date) + '</div></div>' +
       '</div>';
   }).join('');
-
+ 
   document.getElementById('deadlineList').innerHTML = html;
   showEl('tlOutput');
-
+ 
   // Fire AI tips
   getTimelineTips(loanType, state, totalDays, hoa || enviro, septic || zoning || estoppel, mode);
 }
-
+ 
 async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
   showLoading('tlLoading');
   clearEl('tlAIResults');
-
+ 
   var system = mode === 'commercial'
     ? 'You are a highly gifted genius commercial real estate transaction coordinator and licensed broker with 40 years of experience and thousands of closed CRE deals across all 50 states, including office, retail, industrial, and multifamily. Respond in plain text only. No markdown, no asterisks, no pound signs.'
     : 'You are a highly gifted genius real estate transaction coordinator and licensed broker with 40 years of experience and thousands of closed deals across all 50 states. Respond in plain text only. No markdown, no asterisks, no pound signs.';
-
+ 
   var extras = [];
   if (mode === 'commercial') {
     if (condA) extras.push('Phase I environmental review');
@@ -1567,7 +1697,7 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
     if (condA) extras.push('HOA approval required');
     if (condB) extras.push('septic inspection needed');
   }
-
+ 
   var prompt = 'Transaction details:\n' +
     'Loan type: ' + loanType + '\n' +
     'State: ' + (state || 'not specified') + '\n' +
@@ -1578,7 +1708,7 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
     'Write 5 specific expert warnings and pro tips for this exact transaction type that most agents/brokers miss or overlook. Be brutally specific about what kills deals and what saves them. Number each tip 1 through 5.\n\n' +
     '[AGENT CHECKLIST]\n' +
     'Write a 10-item week-by-week action checklist from contract to close. Organize by timing (Week 1, Week 2, etc.). Number each item.';
-
+ 
   try {
     var raw = await callClaude(system, prompt, 1600);
     var s1 = extractSection(raw, 'EXPERT TIPS');
@@ -1590,7 +1720,7 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
     document.getElementById('tlAIResults').innerHTML =
       '<div class="err-box">Could not load AI tips: ' + escHTML(e.message) + '</div>';
   }
-
+ 
   hideLoading('tlLoading');
 }
 </script>
@@ -1599,17 +1729,17 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
 (function(){
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return; // no support: fields behave exactly as before, no buttons added
-
+ 
   var MIC_SVG = '<svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3z"/><path d="M19 11a7 7 0 01-14 0"/><line x1="12" y1="18" x2="12" y2="22"/></svg>';
-
+ 
   var numberFieldIds = ['salePrice','commRate','listSplit','buySplit','agentSplit','fees','offerAsk','offerPrice','offerDOM','ohBudget','noi','downPayment','debtService','commSqft','ldSqftCRE','offerLeaseTerm'];
   var textFieldIds = ['mktSpecs','mktNeighborhood','mktPrice','offerAddr','offerClose','offerTerms','fuName','fuSituation','fuAgent','ldBedBath','ldSqft','ldFeatures','ldLocation','ldPrice','ohAddr','ohHighlights','ohDate','tlState','ldLeaseRate','offerBaseRent','offerCAM','offerTI'];
   var selectFieldIds = ['offerSide','offerMotivation','fuLeadType','fuTone','ldType','ldBuyer','ohVisitor','tlType','commPropType','ldBuildingClass','ldTypeCRE','ldBuyerCRE','ldLeaseType','offerDealType','fuLeadTypeCRE','ohVisitorCRE','tlTypeCRE'];
-
+ 
   var WORD_NUMS = {zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,
     eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,
     twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
-
+ 
   function wordsToInt(words){
     var total = 0, current = 0, found = false;
     words.forEach(function(w){
@@ -1622,7 +1752,7 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
     total += current;
     return found ? total : null;
   }
-
+ 
   function parseSpokenNumber(t){
     var s = t.toLowerCase()
       .replace(/\$/g,'')
@@ -1633,39 +1763,39 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
       .replace(/\bpercent\b/g,'')
       .replace(/-/g,' ')
       .trim();
-
+ 
     var scaleMap = {thousand:1e3, grand:1e3, k:1e3, million:1e6, billion:1e9};
-
+ 
     if (/\bpoint\b/.test(s)) {
       var parts = s.split(/\bpoint\b/);
       var beforeWords = parts[0].trim().split(/\s+/).filter(Boolean);
       var afterWords = (parts[1]||'').trim().split(/\s+/).filter(Boolean);
-
+ 
       var scaleWord = null;
       if (afterWords.length && scaleMap.hasOwnProperty(afterWords[afterWords.length-1])) {
         scaleWord = afterWords.pop();
       }
-
+ 
       var intPart = wordsToInt(beforeWords);
       var fracDigits = '';
       afterWords.forEach(function(w){
         if (WORD_NUMS.hasOwnProperty(w) && WORD_NUMS[w] < 10) fracDigits += String(WORD_NUMS[w]);
       });
-
+ 
       if (intPart !== null || fracDigits) {
         var val = parseFloat((intPart !== null ? intPart : 0) + '.' + (fracDigits || '0'));
         if (scaleWord) val *= scaleMap[scaleWord];
         return String(Math.round(val));
       }
     }
-
+ 
     var digitScaleMatch = s.match(/(\d+(?:\.\d+)?)\s*(thousand|grand|million|billion|k)?/);
     if (digitScaleMatch && digitScaleMatch[1]) {
       var n = parseFloat(digitScaleMatch[1]);
       if (digitScaleMatch[2]) n *= scaleMap[digitScaleMatch[2]];
       if (!isNaN(n)) return String(Math.round(n));
     }
-
+ 
     var words = s.split(/\s+/).filter(Boolean);
     var total = 0, current = 0, found = false;
     words.forEach(function(w){
@@ -1678,7 +1808,7 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
     total += current;
     return found ? String(total) : null;
   }
-
+ 
   function fuzzyMatch(transcript, options){
     var t = transcript.toLowerCase();
     var best = null, bestScore = 0;
@@ -1690,42 +1820,42 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
     });
     return bestScore > 0 ? best : null;
   }
-
+ 
   function fireEvent(el, name){
     var ev;
     try { ev = new Event(name, {bubbles:true}); } catch(e){ ev = document.createEvent('Event'); ev.initEvent(name, true, true); }
     el.dispatchEvent(ev);
   }
-
+ 
   function addMic(el, kind){
     if (!el || el.dataset.voiceAdded) return;
     el.dataset.voiceAdded = '1';
-
+ 
     var wrap = document.createElement('div');
     wrap.className = 'voice-wrap';
     el.parentNode.insertBefore(wrap, el);
     wrap.appendChild(el);
-
+ 
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'mic-btn';
     btn.setAttribute('aria-label','Speak this field');
     btn.innerHTML = '<span class="mic-ico">'+MIC_SVG+'</span><span class="mic-bars"><span></span><span></span><span></span><span></span></span>';
     wrap.appendChild(btn);
-
+ 
     var status = document.createElement('div');
     status.className = 'mic-status';
     wrap.appendChild(status);
-
+ 
     var listening = false;
     var rec = null;
-
+ 
     function reset(){
       listening = false;
       btn.classList.remove('listening');
       rec = null;
     }
-
+ 
     function applyResult(alts){
       if (kind === 'select'){
         var opts = Array.prototype.map.call(el.options, function(o){ return o.value; }).filter(Boolean);
@@ -1759,7 +1889,7 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
         status.className = 'mic-status confirmed'; status.textContent = 'Added "' + transcript + '"';
       }
     }
-
+ 
     function startListening(){
       if (listening) return;
       var r = new SR();
@@ -1767,12 +1897,12 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
       r.lang = 'en-US';
       r.interimResults = true;
       r.maxAlternatives = kind === 'text' ? 1 : 4;
-
+ 
       listening = true;
       btn.classList.add('listening');
       status.className = 'mic-status active';
       status.textContent = 'Listening…';
-
+ 
       var launch = function(){
         try { r.start(); }
         catch(e){
@@ -1783,7 +1913,7 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
         }
       };
       launch();
-
+ 
       r.onresult = function(event){
         var finalAlts = null, interimText = '';
         for (var k = 0; k < event.results.length; k++){
@@ -1797,7 +1927,7 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
           status.textContent = interimText;
         }
       };
-
+ 
       r.onerror = function(event){
         if (event.error === 'no-speech'){
           status.className = 'mic-status'; status.textContent = 'Didn\'t hear anything — tap to try again';
@@ -1807,12 +1937,12 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
           status.className = 'mic-status'; status.textContent = 'Tap to try again';
         }
       };
-
+ 
       r.onend = function(){
         reset();
       };
     }
-
+ 
     btn.addEventListener('click', function(){
       if (listening){
         if (rec) { try { rec.stop(); } catch(e){} }
@@ -1823,13 +1953,13 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
       startListening();
     });
   }
-
+ 
   document.addEventListener('DOMContentLoaded', function(){
     numberFieldIds.forEach(function(id){ addMic(document.getElementById(id), 'number'); });
     textFieldIds.forEach(function(id){ addMic(document.getElementById(id), 'text'); });
     selectFieldIds.forEach(function(id){ addMic(document.getElementById(id), 'select'); });
   });
-
+ 
   if (document.readyState === 'complete' || document.readyState === 'interactive'){
     numberFieldIds.forEach(function(id){ addMic(document.getElementById(id), 'number'); });
     textFieldIds.forEach(function(id){ addMic(document.getElementById(id), 'text'); });
@@ -1843,9 +1973,9 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
   var listEl = document.getElementById('listSplit');
   var buyEl = document.getElementById('buySplit');
   if (!listEl || !buyEl) return;
-
+ 
   function clamp(v){ return Math.max(0, Math.min(100, v)); }
-
+ 
   listEl.addEventListener('input', function(){
     var v = parseFloat(listEl.value);
     if (!isNaN(v)){
@@ -1853,7 +1983,7 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
       if (typeof calcCommission === 'function') calcCommission();
     }
   });
-
+ 
   buyEl.addEventListener('input', function(){
     var v = parseFloat(buyEl.value);
     if (!isNaN(v)){
@@ -1865,8 +1995,8 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
 </script>
 </body>
 </html>
-
-
+ 
+ 
 <div style="max-width: 800px; margin: 40px auto; padding: 30px; background: linear-gradient(to bottom, #18181b, #000000); border: 2px solid #d4af37; border-radius: 12px; text-align: center; font-family: sans-serif; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
     <span style="font-size: 11px; font-family: monospace; color: #d4af37; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 8px;">⚜️ PREMIUM ENTERPRISE PLACEMENT</span>
     <h3 style="font-size: 22px; font-weight: bold; color: #ffffff; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px 0;">Want Absolute Local Market Monopoly?</h3>
@@ -1877,9 +2007,9 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
         Apply for Dedicated Regional Management →
     </a>
 </div>
-
-
-
+ 
+ 
+ 
 <div style="max-width: 800px; margin: 40px auto; padding: 30px; background: #d4af37; border: 2px solid #aa8423; border-radius: 12px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
     
     <div style="display: inline-flex; align-items: center; background: #ffffff; padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; border: 1px solid rgba(0,0,0,0.1);">
@@ -1904,10 +2034,10 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
     
     <span style="display: block; font-size: 11px; color: #000000; margin-top: 16px; font-family: monospace; font-weight: 700;">🔒 Insured PCI-Compliant 256-Bit Stripe Checkout</span>
 </div>
-
-
-
-
+ 
+ 
+ 
+ 
 <div style="max-width: 800px; margin: 30px auto; padding: 25px; background: #111115; border: 1px solid #27272a; border-radius: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; box-shadow: 0 4px 20px rgba(0,0,0,0.4); text-align: left;">
     
     <div style="display: flex; align-items: center; margin-bottom: 15px;">
@@ -1918,7 +2048,7 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
     <p style="font-size: 13px; color: #a1a1aa; margin: 0 0 20px 0; line-height: 1.5;">
         To deploy the matrices in our master vault at maximum scale, elite agents use the following standardized operational blueprints.
     </p>
-
+ 
     <div style="background: rgba(212, 175, 55, 0.03); border: 1px solid rgba(212, 175, 55, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
         <div>
             <span style="font-size: 14px; font-weight: 600; color: #ffffff; display: block; margin-bottom: 4px;">🤖 Open-Source AI Script Automation Hub</span>
@@ -1926,9 +2056,9 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
         </div>
         <a href="https://chatgpt.com" target="_blank" style="padding: 8px 16px; background: #d4af37; color: #000000; font-size: 11px; font-weight: 700; text-decoration: none; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;">Launch Engine →</a>
     </div>
-
+ 
    
-
+ 
 <footer style="max-width: 800px; margin: 20px auto 40px auto; padding: 20px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
     <hr style="border: 0; border-top: 1px solid #27272a; margin-bottom: 20px;">
     <p style="font-size: 12px; color: #71717a; line-height: 1.6; margin: 0 0 8px 0;">
@@ -1938,9 +2068,9 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
         <strong>Disclaimer &amp; Terms:</strong> The digital tools, systems, frameworks, and matrices provided within this toolkit are for informational and business acceleration purposes only. Perryman’s Assets, LLC does not guarantee specific transaction volumes, income increases, or specific market performance. Unauthorized duplication, reverse-engineering, or digital scraping of this platform wrapper or its nested assets is strictly prohibited and will be prosecuted to the fullest extent of corporate trademark and property law. Transactions are securely managed off-site via PCI-Compliant Stripe architecture.
     </p>
 </footer>
-
-
-
+ 
+ 
+ 
   <script>
     // Disables right-click context menu
     document.addEventListener('contextmenu', event => event.preventDefault());
@@ -1954,3 +2084,4 @@ async function getTimelineTips(loanType, state, totalDays, condA, condB, mode) {
         if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
     }
 </script>
+ 
